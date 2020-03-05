@@ -49,7 +49,7 @@ export default {
       .audio{
         height: 2.1875rem /* 35/16 */;
         margin-top: 0.8rem;
-        margin-right: .8125rem /* 13/16 */;
+        margin-right: .8125rem;
         position: relative;
         .audio-img{
           position: absolute;
