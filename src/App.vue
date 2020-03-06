@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <div class="audio">
+      <img class="music" src="@/images/music.png" alt />
+    </div>
     <router-view />
   </div>
 </template>
@@ -8,30 +11,25 @@ export default {
   data(){
     return {};
   },
-  beforeMount() {
-    this.wx.miniProgram.getEnv(res => {
-      console.log(res)
-      if (res.miniprogram) {
-        /* 用户id */
-        // const uid = this.utils.getQueryString("uid");
-        // /* 商品id */
-        // const goodsId = this.utils.getQueryString("goodsId");
-        // console.log(uid, goodsId);
-        // this.$store.commit("setAuth", { uid, goodsId });
-      }
-    });
+  mounted(){
+    if (process.env.NODE_ENV == "development") {
+      this.init();
+    } else {
+      this.$wx.miniProgram.getEnv(res => {
+        console.log("mini")
+        if (res.miniprogram) {
+          this.init();
+        }
+      });
+    }
   },
   methods: {
-    // redirectToAuthPage() { //初始化
-    //   const redirectURI = encodeURIComponent(`http://192.168.1.105:8080/`);  //网址
-    //   const state = encodeURIComponent('');
-    //   const APPID = 'wx756d04f5d669cef0';
-    //   const wxURI = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${APPID}&redirect_uri=${redirectURI}&response_type=code&scope=snsapi_userinfo&state=${state}#wechat_redirect`;
-    //   window.location.href = wxURI;
-    // }
-  },
-  created(){
-    // this.redirectToAuthPage()
+    init() {
+      /* 用户id */
+      const uid = this.$utils.getQueryString("uid");
+      console.log(11111,uid);
+      this.$store.commit("setUid", { uid });
+    }
   }
 }
 </script>
@@ -48,5 +46,31 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
+  position: relative;
+}
+.audio{
+  margin-top: .9275rem;
+  width: 100%;
+  height: 2.1875rem;
+  position: absolute;
+  right: 3.36%;
+  top: 0;
+  z-index: 99;
+  .music{
+    width: 9.68%;
+    height: 100%;
+    position: absolute;
+    right: .6925rem;
+    top: -0.125rem;
+    // animation: run 3s infinite;
+  }
+}
+@keyframes run {
+  0% {
+    transform: rotate(0deg);
+  }
+  100%{
+    transform: rotate(360deg);
+  }
 }
 </style>

@@ -9,7 +9,8 @@ export default new Vuex.Store({
   },
   mutations: {
     setUid(state, val) {
-      state.uid = val;
+      let { uid } = val;
+      state.uid = uid;
     }
   },
   actions: {}
