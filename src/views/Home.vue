@@ -2,8 +2,6 @@
   <div class="home">
     <img class="poster-bg" src="@/assets/poster-bg.png" alt />
     <div class="content">
-      <div class="audio">
-      </div>
       <div class="title">
         <img class="title-bg" src="@/images/title.png" alt />
       </div>
@@ -41,10 +39,25 @@
         </div>
         <div class="user-info">
           <div class="info">照片</div>
+          <!--
           <div class="upload" @click="uploadImg">
             <img class="upload-add" src="@/images/add-img.png" alt />
             <div>点击上传</div>
             <div>本人照片</div>
+          </div>
+          -->
+          <div class="upload" v-show="!user_image">
+            <input class="upload-btn" name="file" id="upload-img"  type="file" accept="image/*" @change="previewImg">
+            <img class="upload-add" src="@/images/add-img.png" alt />
+            <div>点击上传</div>
+            <div>本人照片</div>
+          </div>
+          <div class="preview" @click="preview" v-show="user_image">
+            <img :src="user_image" alt="" />
+            <img class="del" src="@/images/del-img.png" alt @click="delImg" />
+          </div>
+          <div v-show="preFlag" class="watch-img" @click="unpreview" @touchmove.prevent.stop>
+            <img :src="user_image" alt="" />
           </div>
         </div>
         <div class="submit-img" @click="next"></div>
@@ -60,9 +73,11 @@ export default {
   data(){
     return {
       number: '999',
+      preFlag: false, //图片预览
       showFlag: false,
+      user_image: '',   //用户头像地址
       userName: '',
-      createTime: '',
+      user_createtime: 0,
       share_qrcode: '',
       userSchool: '请选择',
       province_id: 0, //当前省份id
@@ -93,7 +108,10 @@ export default {
   methods: {
     init(){
       console.log(window.location.href.split('#')[0])
-      let url = encodeURIComponent(window.location.href.split('#')[0])
+      let uri = 'https://studyreport.jinlingkeji.cn/';
+      // window.location.href.split('#')[0]
+      // let url = encodeURIComponent(window.location.href.split('#')[0])
+      let url = encodeURIComponent(uri)
       console.log(url)
       this.getJsConfig(url)
     },
@@ -103,7 +121,7 @@ export default {
         console.log(res)
         this.$wx.config({
           debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-          appId: res.appId, // 必填，公众号的唯一标识
+          appId: 'wxbd85dc45a5a84cd8', // 必填，公众号的唯一标识
           timestamp: res.timestamp, // 必填，生成签名的时间戳
           nonceStr: res.nonceStr, // 必填，生成签名的随机串
           signature: res.signature,// 必填，签名
@@ -193,6 +211,11 @@ export default {
         this.university_id = this.columns[2].id[0]
       })
     },
+    putUserInfo(params){
+      http.putUserInfo(params).then(res=>{
+        console.log(res)
+      })
+    },
     getUserInfo() {
       let uid = '1087';
       let params = {uid};
@@ -203,23 +226,61 @@ export default {
         this.province_id = res.province_id;
         this.city_id = res.city_id;
         this.university_id = res.university;
+        this.user_createtime = res.user_createtime;
       })
     },
     next() {
       console.log("下一步");
+      this.userName = this.userName.trim()
       if(!this.userName){
         this.$toast("请输入姓名")
       }else if(this.userSchool == "请选择"){
         this.$toast("请选择学校")
+      }else if(this.user_image == ''){
+        this.$toast("请上传图片")
       }else{
         console.log(this.province_id,this.city_id,this.university_id)
         let params = {
+          // uid: this.$store.state.uid,
+          uid: '1087',
+          user_image: this.user_image,
+          name: this.userName,
+          share_qrcode: this.share_qrcode,
+          userSchool: this.userSchool,
+          number: this.number,
           province_id: this.province_id,
           city_id: this.city_id,
-          university_id: this.university_id
+          university: this.university_id,
+          user_createtime: this.user_createtime
         }
-        this.$router.replace({path: '/share', query: params});
+        this.putUserInfo(params);
+        localStorage.setItem('userInfo',JSON.stringify(params));
+        this.$router.replace({path: '/share'});
       }
+    },
+    previewImg(event){
+      let reader = new FileReader();
+      let img = event.target.files[0];  //图片属性
+      console.log("选择图片",event)
+      reader.readAsDataURL(img)
+      reader.onload = () => {
+        console.log('file 转 base64结果：' + reader.result)
+        this.user_image = reader.result;
+      }
+      reader.onerror = function (error) {
+        console.log('Error: ', error)
+      }
+    },
+    delImg(){ //删除图片
+      this.user_image = ''
+    },
+    preview(){
+      if(this.user_image){  //有图片,显示预览
+        this.preFlag = true;
+      }
+    },
+    unpreview(){
+      this.preFlag = false; //取消预览
     },
     uploadImg() {
       console.log("上传图片")
@@ -274,22 +335,23 @@ export default {
       flex-flow: column;
       background: url('../images/books.png') no-repeat;
       background-size: 100% 100%;
-      .audio{
-        // width: 100%;
-        // height: 2.1875rem;
-        // margin-bottom: 3.68%;
-        position: relative;
-        .music{
-          width: 9.68%;
-          height: 100%;
-          position: absolute;
-          right: .8125rem;
-          top: .71875rem;
-        }
-      }
+      // .audio{
+      //   // width: 100%;
+      //   // height: 2.1875rem;
+      //   // margin-bottom: 3.68%;
+      //   position: relative;
+      //   .music{
+      //     width: 9.68%;
+      //     height: 100%;
+      //     position: absolute;
+      //     right: .8125rem;
+      //     top: .71875rem;
+      //   }
+      // }
       .title{
         width: 70.62%;
         height: 5.35%;
+        margin-top: 49.5px;
         .title-bg{
           width: 100%;
           height: 100%;
@@ -386,26 +448,70 @@ export default {
             }
           }
           .upload{
-            width: 5.9375rem;
-            height: 5.0625rem;
+            width: 95px;
+            height: 95px; //5.0625rem
             border: 1px solid #D00000;
-            border-radius: .3125rem;
+            border-radius: 5px;
             display: flex;
-            // justify-content: center;
+            justify-content: center;
             // padding-top: .875rem 0;
             flex-flow: column;
             align-items: center;
-            padding-bottom: .875rem;
+            // padding-bottom: .875rem;
+            position: relative;
+            .upload-btn{    //文件选择框
+              width: 100%;
+              height: 100%;
+              opacity: 0;
+              position: absolute;
+              top: 0;
+              right: 0;
+            }
             .upload-add{
               width: 25.26%;
-              margin-bottom: .5rem;
-              margin-top: .875rem;
+              margin-bottom: 8px;
             }
             div{
               font-size:1rem;
               font-family:Source Han Sans CN;
               font-weight:400;
               color:rgba(212,34,32,1);
+            }
+          }
+          .preview{
+            width: 95px;
+            height: 95px; //5.0625rem
+            border: 1px solid #D00000;
+            border-radius: 5px;
+            position: relative;
+            img{
+              width: 100%;
+              height: 100%;
+            }
+            .del{
+              width: 24px;
+              height: 24px;
+              position: absolute;
+              top: -9.5px;
+              right: -10px;
+              z-index: 2;
+            }
+          }
+          .watch-img{
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,.6);
+            img{
+              width: 100%;
             }
           }
         }

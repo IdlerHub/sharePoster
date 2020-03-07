@@ -1,7 +1,7 @@
 <template>
   <div class="share">
     <div class="imageWrapper" ref="imageWrapper">
-      <!-- <img class="real_pic" :src="dataURL" /> -->
+      <img class="real_pic" :src="dataURL" />
       <!-- 需要转化为图片的DOM元素 -->
       <slot>
         <div class="canvas-bg">
@@ -9,29 +9,30 @@
           <div class="canvas-info">
             <div class="info-content">
               <span>我叫</span>
-              <span>古月</span>
+              <span>{{userInfo.name}}</span>
             </div>
             <div class="info-content">
               <span>来自</span>
-              <span>山西老年大学</span>
+              <span>{{userInfo.userSchool}}</span>
             </div>
             <div class="info-content">在网上老年大学</div>
             <div class="info-content">
               <span>学习</span>
-              <span>999</span>
+              <span>{{userInfo.number}}</span>
               <span>天啦</span>
             </div>
           </div>
+          <div class="canvas-footer">
+            <div class="canvas-user">
+              <img :src="userInfo.user_image" alt >
+            </div>
+          </div>
           <div class="canvas-er">
-            <img src="@/images/ercode.png" alt />
+            <img :src="userInfo.share_qrcode" alt />
             <div class="text">长按识别二维码</div>
             <div class="text">和好友一起学习</div>
           </div>
-          <div class="canvas-footer">
-            <div class="canvas-user">
-              <!-- img src="" alt /-->
-            </div>
-          </div>
+          
         </div>
       </slot>
     </div>
@@ -43,31 +44,83 @@ export default {
   name: "share",
   data(){ 
     return {
+      userInfo: {},
       dataURL: '',
       ercode: ''
     };
   },
-  created(){
-    let params = this.$route.params;
-    console.log(params)
+  mounted(){
+    // localStorage.getItem('userInfo')
+    this.userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    console.log(this.userInfo)
+    this.toImage()
   },
   methods: {
     toImage() {
-      let params = {
-        backgroundColor: null, //解决生成会有白边的可能
-        allowTaint: true  //是否允许跨域图片(官方文档,代试验)
+      // let config = {
+      //   backgroundColor: null, //解决生成会有白边的可能
+      //   allowTaint: true,  //是否允许跨域图片(官方文档,代试验)
+      //   useCORS: true
+      // }
+      if(this.userInfo.share_qrcode){
+        this.getUrlBase64(this.userInfo.share_qrcode,res=>{
+          this.userInfo.share_qrcode = res;
+          html2canvas(this.$refs.imageWrapper,{
+            backgroundColor: null, //解决生成会有白边的可能
+            allowTaint: true,  //是否允许跨域图片(官方文档,代试验)
+            useCORS: true,
+            taintTest: true
+            // onrendered: function(cnavas){
+            //   let dataURL = canvas.toDataURL("image/png");
+            //   that.dataURL = dataURL;
+            // }
+          }).then((canvas) => {
+            console.log('生成',canvas)
+            // this.$refs.imageWrapper.appendChild(canvas)
+            let dataURL = canvas.toDataURL("image/png");
+            this.dataURL = dataURL;
+          });
+        })
+
+        
       }
-      html2canvas(this.$refs.imageWrapper,params).then((canvas) => {
-        console.log(canvas)
-        let dataURL = canvas.toDataURL("image/png");
-        this.dataURL = dataURL;
-      });
+      
+    },
+    getUrlBase64(url, callback) { //网络资源图片转成base64
+      var canvas = document.createElement("canvas");   //创建canvas DOM元素
+      var ctx = canvas.getContext("2d");
+      var img = new Image;
+      img.crossOrigin = 'Anonymous';
+      img.src = url;
+      img.onload = function () {
+          canvas.height = 108; //指定画板的高度,自定义
+          canvas.width = 108; //指定画板的宽度，自定义
+          ctx.drawImage(img, 0, 0, 108, 108); //参数可自定义
+          var dataURL = canvas.toDataURL("image/");
+          callback.call(this, dataURL); //回掉函数获取Base64编码
+          canvas = null;
+      };
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.share{
+  .imageWrapper{
+    .real_pic{
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 88;
+      opacity: 0;
+    }
+  }
+}
   .canvas-bg{
     min-height: 100vh;
     padding-top: 3.40625rem /* 54.5/16 */;
@@ -87,7 +140,7 @@ export default {
       font-family:Source Han Sans CN;
       font-weight:400;
       color:rgba(255,255,255,1);
-      margin-bottom: 2.8125rem;
+      margin-bottom: 45.5px;
       .info-content{
         margin-bottom: .8125rem;
         & span:nth-child(2){
@@ -95,41 +148,57 @@ export default {
           font-family:Source Han Sans CN;
           font-weight:bold;
           color:rgba(254,207,84,1);
+          margin-left: 5px;
+          margin-right: 5px;
         }
       }
     }
     .canvas-er{
+      max-width: 108px;
       padding-bottom: 5.90625rem /* 94.5/16 */;
+      z-index: 99;
       img{
-        width: 32%;
-        height: 32%;
+        width: 100%;
+        height: 100%;
         margin-bottom: 1.0625rem /* 17/16 */;
+        background: white;
+        border-radius: 5px;
+        overflow: hidden;
       }
       .text{
         font-size: 15px;
         font-family:Source Han Sans CN;
         font-weight:400;
         color:rgba(255,255,255,1);
+        text-align: center;
       }
     }
     .canvas-footer{
-      width: 58.1%;
-      height: 42.4%;
+      // width: 58.1%;
+      // height: 42.4%;
+      width: 218px;
+      height: 349.5px;
       position: absolute;
       bottom: 0;
       right: 0;
       background: url('../images/canvas-people.png') no-repeat;
       background-size: 100% 100%;
+      border: none;
       .canvas-user{
         position: absolute;
-        top: -2.67% /* 5/16 */;
-        right: 8% /* 26/16 */;
-        background: black;
-        width: 4.5875rem /* 94.2/16 */;
-        height: 4.5875rem;
+        top: -4.5px /* 5/16 */;
+        right: 27px /* 26/16 */;
+        width: 90px /* 94.2/16 */;
+        height: 90px;
         border: 2px solid rgba(255,255,255,1);
         border-radius: 100%;
+        overflow: hidden;
+        img{
+          width: 100%;
+          height: 100%;
+        }
       }
     }
   }
+
 </style>

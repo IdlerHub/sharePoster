@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <div class="audio">
-      <img class="music" src="@/images/music.png" alt />
+      <audio src="@/assets/music.mp3" loop="loop" id="bg-music" ref="MusicPlay" preload="auto"></audio>
+      <img v-show="musicFlag" class="music" src="@/images/music.png" alt @click="setMusic"/>
+      <img v-show="!musicFlag" class="music stop" src="@/images/stop-music.png" alt @click="setMusic"/>
     </div>
     <router-view />
   </div>
@@ -9,7 +11,9 @@
 <script>
 export default {
   data(){
-    return {};
+    return {
+      musicFlag: true //true: 当前正在播放
+    };
   },
   mounted(){
     if (process.env.NODE_ENV == "development") {
@@ -23,12 +27,27 @@ export default {
       });
     }
   },
+  beforeDestroy(){
+    //销毁前关掉音乐
+    this.$refs.MusicPlay.stop();
+    this.musicFlag = false;
+  },
   methods: {
     init() {
       /* 用户id */
       const uid = this.$utils.getQueryString("uid");
       console.log(11111,uid);
       this.$store.commit("setUid", { uid });
+      this.$refs.MusicPlay.play();
+      this.musicFlag = true;
+    },
+    setMusic(){
+      this.musicFlag = !this.musicFlag;
+      if(!this.musicFlag){//点击暂停
+        this.$refs.MusicPlay.pause();
+      }else{
+        this.$refs.MusicPlay.play();
+      }
     }
   }
 }
@@ -49,21 +68,25 @@ body {
   position: relative;
 }
 .audio{
-  margin-top: .9275rem;
   width: 100%;
-  height: 2.1875rem;
+  height: 35px;
   position: absolute;
-  right: 3.36%;
+  top: 12px;
+  right: 26.5px;
+  // top: 12px;
+  // right: 12.5px;
+}
+.music{
+  width: 35px;
+  height: 35px;
+  position: absolute;
+  right: 0;
   top: 0;
+  animation: run 2s linear infinite;
   z-index: 99;
-  .music{
-    width: 9.68%;
-    height: 100%;
-    position: absolute;
-    right: .6925rem;
-    top: -0.125rem;
-    // animation: run 3s infinite;
-  }
+}
+.stop{
+  animation: none;
 }
 @keyframes run {
   0% {
@@ -71,6 +94,22 @@ body {
   }
   100%{
     transform: rotate(360deg);
+  }
+}
+@media screen and (min-width: 414px){
+  .audio{
+    right: 32.5px ;
+  }
+}
+@media screen and (max-width: 320px){
+  .audio{
+    // top: 28px;
+    right: 21px;
+  }
+}
+@media screen and (min-height: 1000px) {
+  .audio{
+    top: 28px;
   }
 }
 </style>
