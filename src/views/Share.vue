@@ -53,7 +53,9 @@ export default {
     this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
     this.$toast("长按海报发送给好友")
     console.log(this.userInfo);
-    this.toImage();
+    setTimeout(()=>{
+      this.toImage();
+    },1000)
   },
   methods: {
     toImage() {
@@ -65,17 +67,19 @@ export default {
       if (this.userInfo.share_qrcode) {
         this.getUrlBase64(this.userInfo.share_qrcode, res => {
           this.userInfo.share_qrcode = res;
-          html2canvas(this.$refs.imageWrapper, {
-            backgroundColor: null, //解决生成会有白边的可能
-            allowTaint: true, //是否允许跨域图片(官方文档,代试验)
-            useCORS: true,
-            taintTest: true
-          }).then(canvas => {
-            console.log("生成", canvas);
-            // this.$refs.imageWrapper.appendChild(canvas)
-            let dataURL = canvas.toDataURL("image/png");
-            this.dataURL = dataURL;
-          });
+          // setTimeout(()=>{
+            html2canvas(this.$refs.imageWrapper, {
+              backgroundColor: null, //解决生成会有白边的可能
+              allowTaint: true, //是否允许跨域图片(官方文档,代试验)
+              useCORS: true,
+              taintTest: true
+            }).then(canvas => {
+              console.log("生成", canvas);
+              // this.$refs.imageWrapper.appendChild(canvas)
+              let dataURL = canvas.toDataURL("image/png");
+              this.dataURL = dataURL;
+            });
+          // },100)
         });
       }
     },
@@ -102,6 +106,10 @@ export default {
 <style lang="scss" scoped>
 .share {
   .imageWrapper {
+    min-height: 100vh;
+    background: url("../images/canvas-bg.png") no-repeat;
+    background-size: 100% 100%;
+    position: relative;
     .real_pic {
       width: 100%;
       height: 100%;
@@ -116,12 +124,12 @@ export default {
   }
 }
 .canvas-bg {
-  min-height: 100vh;
+  min-height: 100%;
   padding-top: 3.40625rem /* 54.5/16 */;
   padding-left: 1.875rem;
-  background: url("../images/canvas-bg.png") no-repeat;
-  background-size: 100% 100%;
-  position: relative;
+  // background: url("../images/canvas-bg.png") no-repeat;
+  // background-size: 100% 100%;
+  // position: relative;
   .canvas-title {
     width: 13.35rem;
     height: 8.35rem;
@@ -148,7 +156,7 @@ export default {
     }
   }
   .canvas-er {
-    max-width: 108px;
+    max-width: 6.75rem /* 108/16 */;
     padding-bottom: 5.90625rem /* 94.5/16 */;
     z-index: 99;
     img {
@@ -170,8 +178,8 @@ export default {
   .canvas-footer {
     // width: 58.1%;
     // height: 42.4%;
-    width: 218px;
-    height: 349.5px;
+    width: 13.625rem /* 218/16 */;
+    height: 21.8438rem /* 349.5/16 */;
     position: absolute;
     bottom: 0;
     right: 0;
@@ -181,9 +189,9 @@ export default {
     .canvas-user {
       position: absolute;
       top: -4.5px /* 5/16 */;
-      right: 27px /* 26/16 */;
-      width: 90px /* 94.2/16 */;
-      height: 90px;
+      right: 1.625rem /* 26/16 */;
+      width: 5.8875rem /* 94.2/16 */;
+      height: 5.8875rem /* 94.2/16 */;
       border: 2px solid rgba(255, 255, 255, 1);
       border-radius: 100%;
       overflow: hidden;

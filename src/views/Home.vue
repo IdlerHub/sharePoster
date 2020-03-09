@@ -349,10 +349,11 @@ export default {
 <style scoped lang="scss">
 .home {
   flex: 1 1 auto;
-  // background: url('/assets/poster-bg.png') no-repeat;
-  background-size: 100% 100%;
   display: flex;
-  flex-flow: column;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
   .poster-bg {
     width: 100%;
     min-height: 100vh;
@@ -364,16 +365,15 @@ export default {
     z-index: -1;
   }
   .content {
-    flex: 1;
-    min-height: 100vh;
     width: 96.4%;
-    // margin-top: 0.9375rem;
-    // margin-bottom: 0.9375rem;
-    position: fixed;
-    top: 16.5px;
-    bottom: 15.5px;
-    left: 0;
-    right: 3.6%;
+    height: 100%;
+    margin-top: 0.9375rem;
+    margin-bottom: 0.9375rem;
+    // position: fixed;
+    // top: 2.47%;
+    // bottom: 2.32%;
+    // left: 0;
+    // right: 3.6%;
     display: flex;
     align-items: center;
     flex-flow: column;
@@ -382,7 +382,7 @@ export default {
     .title {
       width: 70.62%;
       height: 5.35%;
-      margin-top: 49.5px;
+      margin-top: 3.0938rem /* 49.5/16 */;
       .title-bg {
         width: 100%;
         height: 100%;
@@ -390,7 +390,7 @@ export default {
     }
     .number {
       text-align: center;
-      font-size: 1.1875rem;
+      font-size: 1.1875rem /* 19/16 */;
       font-family: Source Han Sans CN;
       font-weight: 500;
       color: rgba(212, 34, 32, 1);
@@ -409,13 +409,13 @@ export default {
       }
     }
     .container {
-      margin-top: 6.7%;
+      margin-top: 1.125rem /* 18/16 */;
       width: 100%;
       .user-info {
-        margin-bottom: 1.25rem;
-        margin-left: 13%;
+        margin-bottom: 1.25rem /* 20/16 */;
+        margin-left: 2.9688rem /* 47.5/16 */;
         .info {
-          margin-bottom: 0.625rem;
+          margin-bottom: .625rem /* 10/16 */;
           font-size: 1.1875rem;
           font-family: Source Han Sans CN;
           font-weight: 500;
@@ -512,8 +512,8 @@ export default {
           }
         }
         .preview {
-          width: 95px;
-          height: 95px; //5.0625rem
+          width: 5.9375rem /* 95/16 */;
+          height: 5.9375rem /* 95/16 */;
           border: 1px solid #d00000;
           border-radius: 5px;
           position: relative;
@@ -549,15 +549,44 @@ export default {
         }
       }
       .submit-img {
+        // width: 16rem /* 256/16 */;
         width: 70.82%;
-        height: 3.125rem;
-        margin-left: 13%;
-        margin-top: 1.25rem;
-        margin-bottom: 4.6875rem;
+        height: 3.125rem /* 50/16 */;
+        margin-left: 2.9375rem /* 47/16 */;
+        // margin-top: 1.25rem /* 20/16 */;
+        // margin-bottom: 4.75rem; /* 76/16 */
         background: url("../images/submit.png") no-repeat;
         background-size: 100% 100%;
       }
     }
+  }
+}
+
+@media screen and (max-height: 667px) {
+  .home .content .title{
+    margin-top: 2.5rem /* 40/16 */;
+  }
+  .home .content .container{
+    margin-top: .625rem /* 10/16 */;
+  }
+  .home .content .container .user-info{
+    margin-bottom: .5rem;
+  }
+}
+@media screen and (max-height: 568px){
+  .home .content .title{
+    margin-top: 3.0938rem /* 49.5/16 */;
+  }
+  .home .content .container{
+    margin-top: 1.25rem /* 20/16 */;;
+  }
+  .home .content .container .user-info{
+    margin-bottom: 1rem;
+  }
+}
+@media screen and (min-height: 812px){
+  .home .content .title{
+    margin-top: 3.2188rem /* 51.5/16 */;
   }
 }
 // @media screen and (max-height: 667px) {

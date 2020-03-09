@@ -46,12 +46,6 @@ export default {
     //   });
     // }
   },
-  mounted() {
-    // this.$wx.ready(function () {
-    //   this.$refs.MusicPlay.play();
-    //   this.musicFlag = true;
-    // })
-  },
   beforeDestroy() {
     //销毁前关掉音乐
     this.$refs.MusicPlay.stop();
@@ -95,18 +89,28 @@ body {
   height: 100%;
   position: relative;
 }
+
+html {
+  font-size: 16px;
+}
+@media screen and (max-width: 359px) {
+  html {
+    font-size: 12px;
+  }
+}
+
 .audio {
   width: 100%;
-  height: 35px;
+  height: 2.1875rem /* 35/16 */;
   position: absolute;
-  top: 28px;
-  right: 26.5px;
+  top: 1.75rem /* 28/16 */;
+  right: 1.6563rem /* 26.5/16 */;
   // top: 12px;
   // right: 12.5px;
 }
 .music {
-  width: 35px;
-  height: 35px;
+  width: 2.1875rem /* 35/16 */;
+  height: 2.1875rem /* 35/16 */;
   position: absolute;
   right: 0;
   top: 0;
@@ -132,7 +136,7 @@ body {
 @media screen and (max-width: 320px) {
   .audio {
     // top: 28px;
-    right: 21px;
+    right: 26px;
   }
 }
 @media screen and (min-height: 1000px) {
