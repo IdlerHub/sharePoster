@@ -1,21 +1,39 @@
 <template>
   <div id="app">
     <div class="audio">
-      <audio src="@/assets/music.mp3" loop="loop" id="bg-music" ref="MusicPlay" preload="auto"></audio>
-      <img v-show="musicFlag" class="music" src="@/images/music.png" alt @click="setMusic"/>
-      <img v-show="!musicFlag" class="music stop" src="@/images/stop-music.png" alt @click="setMusic"/>
+      <audio
+        src="@/assets/music.mp3"
+        loop="loop"
+        id="bg-music"
+        ref="MusicPlay"
+        preload="auto"
+      ></audio>
+      <img
+        v-show="musicFlag"
+        class="music"
+        src="@/images/music.png"
+        alt
+        @click="setMusic"
+      />
+      <img
+        v-show="!musicFlag"
+        class="music stop"
+        src="@/images/stop-music.png"
+        alt
+        @click="setMusic"
+      />
     </div>
     <router-view />
   </div>
 </template>
 <script>
 export default {
-  data(){
+  data() {
     return {
       musicFlag: true //true: 当前正在播放
     };
   },
-  created(){
+  created() {
     this.init();
     // if (process.env.NODE_ENV == "development") {
     //   this.init();
@@ -28,11 +46,11 @@ export default {
     //   });
     // }
   },
-  mounted(){
+  mounted() {
     this.$refs.MusicPlay.play();
     this.musicFlag = true;
   },
-  beforeDestroy(){
+  beforeDestroy() {
     //销毁前关掉音乐
     this.$refs.MusicPlay.stop();
     this.musicFlag = false;
@@ -41,19 +59,20 @@ export default {
     init() {
       /* 用户id */
       const uid = this.$utils.getQueryString("uid");
-      console.log(11111,uid);
+      console.log("uid", uid);
       this.$store.commit("setUid", { uid });
     },
-    setMusic(){
+    setMusic() {
       this.musicFlag = !this.musicFlag;
-      if(!this.musicFlag){//点击暂停
+      if (!this.musicFlag) {
+        //点击暂停
         this.$refs.MusicPlay.pause();
-      }else{
+      } else {
         this.$refs.MusicPlay.play();
       }
     }
   }
-}
+};
 </script>
 <style lang="scss">
 html,
@@ -70,7 +89,7 @@ body {
   height: 100%;
   position: relative;
 }
-.audio{
+.audio {
   width: 100%;
   height: 35px;
   position: absolute;
@@ -79,7 +98,7 @@ body {
   // top: 12px;
   // right: 12.5px;
 }
-.music{
+.music {
   width: 35px;
   height: 35px;
   position: absolute;
@@ -88,30 +107,30 @@ body {
   animation: run 2s linear infinite;
   z-index: 99;
 }
-.stop{
+.stop {
   animation: none;
 }
 @keyframes run {
   0% {
     transform: rotate(0deg);
   }
-  100%{
+  100% {
     transform: rotate(360deg);
   }
 }
-@media screen and (min-width: 414px){
-  .audio{
-    right: 32.5px ;
+@media screen and (min-width: 414px) {
+  .audio {
+    right: 32.5px;
   }
 }
-@media screen and (max-width: 320px){
-  .audio{
+@media screen and (max-width: 320px) {
+  .audio {
     // top: 28px;
     right: 21px;
   }
 }
 @media screen and (min-height: 1000px) {
-  .audio{
+  .audio {
     top: 28px;
   }
 }
