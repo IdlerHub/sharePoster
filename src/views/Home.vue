@@ -40,7 +40,6 @@
         </div>
         <div class="user-info">
           <div class="info">照片</div>
-
           <div class="upload" @click="chooseImg" v-show="!user_image">
             <img class="upload-add" src="@/images/add-img.png" alt />
             <div>点击上传</div>
@@ -49,6 +48,9 @@
           <div class="preview" @click="preview" v-if="user_image">
             <img :src="user_image" alt="" />
             <img class="del" src="@/images/del-img.png" alt @click="delImg" />
+          </div>
+          <div v-show="preFlag" class="watch-img" @click="unpreview" @touchmove.prevent.stop>
+            <img :src="user_image" alt="" />
           </div>
         </div>
         <div class="submit-img" @click="next"></div>
@@ -210,6 +212,7 @@ export default {
     getUserInfo() {
       let uid = this.number;
       let params = { uid };
+      console.log(uid)
       http.getUserInfo(params).then(res => {
         this.userName = res.name;
         this.userSchool = res.university_name;
@@ -219,6 +222,7 @@ export default {
         this.university_id = res.university;
         this.user_createtime = res.user_createtime;
         this.study_day = res.study_day;
+        this.user_image = res.user_image;
       });
     },
     next() {
@@ -244,7 +248,8 @@ export default {
           province_id: this.province_id,
           city_id: this.city_id,
           university: this.university_id,
-          user_createtime: this.user_createtime
+          user_createtime: this.user_createtime,
+
         };
         this.putUserInfo(params);
         localStorage.setItem("userInfo", JSON.stringify(params));
@@ -291,14 +296,18 @@ export default {
         success(res) {
           let localIds = res.localIds;
           console.log("localId", localIds);
-          that.$wx.getLocalImgData({
-            localId: localIds[0], // 图片的localID
-            success: function(res) {
-              var localData = res.localData; // localData是图片的base64数据，可以用img标签显示
-              that.user_image = localData;
-              console.log("本地base64", res);
-            }
-          });
+          // that.$wx.getLocalImgData({
+          //   localId: localIds[0], // 图片的localID
+          //   success: function(res) {
+          //     var localData = res.localData; // localData是图片的base64数据，可以用img标签显示
+          //     if(localData.substr(0,4) == 'data'){
+          //       that.user_image = localData;
+          //     }else{
+          //       that.user_image = 'data:image/png;base64,' + localData;
+          //     }
+          //     console.log("本地base64",res)
+          //   }
+          // });
           setTimeout(() => {
             that.$wx.uploadImage({
               localId: localIds[0],
@@ -310,6 +319,7 @@ export default {
                 console.log("上传图片传参", params);
                 http.uploadImage(params).then(res => {
                   console.log("上传回调", res);
+                  that.user_image = res.image;
                 });
               },
               fail: function(err) {
@@ -338,7 +348,12 @@ export default {
 </script>
 <style scoped lang="scss">
 .home {
-  min-height: 100vh;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
   .poster-bg {
     width: 100%;
     min-height: 100vh;
@@ -351,13 +366,14 @@ export default {
   }
   .content {
     width: 96.4%;
+    height: 100%;
     margin-top: 0.9375rem;
     margin-bottom: 0.9375rem;
-    position: fixed;
-    top: 2.47%;
-    bottom: 2.32%;
-    left: 0;
-    right: 3.6%;
+    // position: fixed;
+    // top: 2.47%;
+    // bottom: 2.32%;
+    // left: 0;
+    // right: 3.6%;
     display: flex;
     align-items: center;
     flex-flow: column;
@@ -366,7 +382,7 @@ export default {
     .title {
       width: 70.62%;
       height: 5.35%;
-      margin-top: 49.5px;
+      margin-top: 3.0938rem /* 49.5/16 */;
       .title-bg {
         width: 100%;
         height: 100%;
@@ -374,7 +390,7 @@ export default {
     }
     .number {
       text-align: center;
-      font-size: 1.1875rem;
+      font-size: 1.1875rem /* 19/16 */;
       font-family: Source Han Sans CN;
       font-weight: 500;
       color: rgba(212, 34, 32, 1);
@@ -393,13 +409,13 @@ export default {
       }
     }
     .container {
-      margin-top: 6.7%;
+      margin-top: 1.125rem /* 18/16 */;
       width: 100%;
       .user-info {
-        margin-bottom: 1.25rem;
-        margin-left: 13%;
+        margin-bottom: 1.25rem /* 20/16 */;
+        margin-left: 2.9688rem /* 47.5/16 */;
         .info {
-          margin-bottom: 0.625rem;
+          margin-bottom: .625rem /* 10/16 */;
           font-size: 1.1875rem;
           font-family: Source Han Sans CN;
           font-weight: 500;
@@ -496,8 +512,8 @@ export default {
           }
         }
         .preview {
-          width: 95px;
-          height: 95px; //5.0625rem
+          width: 5.9375rem /* 95/16 */;
+          height: 5.9375rem /* 95/16 */;
           border: 1px solid #d00000;
           border-radius: 5px;
           position: relative;
@@ -526,39 +542,68 @@ export default {
           display: flex;
           justify-content: center;
           align-items: center;
-          background: rgba(0, 0, 0, 0.6);
+          background: rgba(0, 0, 0, 1);
           img {
             width: 100%;
           }
         }
       }
       .submit-img {
+        // width: 16rem /* 256/16 */;
         width: 70.82%;
-        height: 3.125rem;
-        margin-left: 13%;
-        margin-top: 1.25rem;
-        margin-bottom: 4.6875rem;
+        height: 3.125rem /* 50/16 */;
+        margin-left: 2.9375rem /* 47/16 */;
+        // margin-top: 1.25rem /* 20/16 */;
+        // margin-bottom: 4.75rem; /* 76/16 */
         background: url("../images/submit.png") no-repeat;
         background-size: 100% 100%;
       }
     }
   }
 }
+
 @media screen and (max-height: 667px) {
-  .home .content {
-    position: relative;
-    top: 0;
-    right: 0;
+  .home .content .title{
+    margin-top: 2.5rem /* 40/16 */;
   }
-  .home .content .container .user-info input {
-    width: 76.82%;
+  .home .content .container{
+    margin-top: .625rem /* 10/16 */;
   }
-}
-@media screen and (min-width: 375px) {
-  .home .content {
-    position: relative;
-    top: 0;
-    right: 0;
+  .home .content .container .user-info{
+    margin-bottom: .5rem;
   }
 }
+@media screen and (max-height: 568px){
+  .home .content .title{
+    margin-top: 3.0938rem /* 49.5/16 */;
+  }
+  .home .content .container{
+    margin-top: 1.25rem /* 20/16 */;;
+  }
+  .home .content .container .user-info{
+    margin-bottom: 1rem;
+  }
+}
+@media screen and (min-height: 812px){
+  .home .content .title{
+    margin-top: 3.2188rem /* 51.5/16 */;
+  }
+}
+// @media screen and (max-height: 667px) {
+//   .home .content {
+//     position: relative;
+//     top: 0;
+//     right: 0;
+//   }
+//   .home .content .container .user-info input {
+//     width: 76.82%;
+//   }
+// }
+// @media screen and (min-width: 375px) {
+//   .home .content {
+//     position: relative;
+//     top: 0;
+//     right: 0;
+//   }
+// }
 </style>
