@@ -9,6 +9,11 @@ export default {
   putUserInfo(params) {
     return Vue.axios.post("/Studyreport/putUserInfo", params);
   },
+  //POST Studyreport/uploadImage 上传图片
+  uploadImage(params) {
+    return Vue.axios.post("/Studyreport/uploadImage", params);
+  },
+
   //POST /Studyreport/getAllUniversity 获取用户信息  uid
   getUserInfo(params) {
     return Vue.axios.post("/Studyreport/getUserInfo", params);

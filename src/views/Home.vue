@@ -39,13 +39,13 @@
         </div>
         <div class="user-info">
           <div class="info">照片</div>
-          <!--
-          <div class="upload" @click="uploadImg">
+          
+          <div class="upload" @click="chooseImg">
             <img class="upload-add" src="@/images/add-img.png" alt />
             <div>点击上传</div>
             <div>本人照片</div>
           </div>
-          -->
+<!--
           <div class="upload" v-show="!user_image">
             <input class="upload-btn" name="file" id="upload-img"  type="file" accept="image/*" @change="previewImg">
             <img class="upload-add" src="@/images/add-img.png" alt />
@@ -58,6 +58,11 @@
           </div>
           <div v-show="preFlag" class="watch-img" @click="unpreview" @touchmove.prevent.stop>
             <img :src="user_image" alt="" />
+          </div>
+-->
+          <div class="preview" @click="preview" v-if="user_image.length">
+            <img :src="user_image" alt="" />
+            <img class="del" src="@/images/del-img.png" alt @click="delImg" />
           </div>
         </div>
         <div class="submit-img" @click="next"></div>
@@ -108,10 +113,8 @@ export default {
   methods: {
     init(){
       console.log(window.location.href.split('#')[0])
-      let uri = 'https://studyreport.jinlingkeji.cn/';
-      // window.location.href.split('#')[0]
-      // let url = encodeURIComponent(window.location.href.split('#')[0])
-      let url = encodeURIComponent(uri)
+      window.location.href.split('#')[0]
+      let url = encodeURIComponent(window.location.href.split('#')[0])
       console.log(url)
       this.getJsConfig(url)
     },
@@ -132,9 +135,9 @@ export default {
             'uploadImage'
           ] // 必填，需要使用的JS接口列表
         })
-        this.$wx.ready(res=>{
-          console.log(res)
-        })
+        // this.$wx.ready(res=>{
+        //   console.log(res)
+        // })
       })
     },
     confirmSc(val) {
@@ -217,8 +220,8 @@ export default {
       })
     },
     getUserInfo() {
-      let uid = '1087';
-      let params = {uid};
+      let uid = this.number;
+      let params = { uid };
       http.getUserInfo(params).then(res=>{
         this.userName = res.name;
         this.userSchool = res.university_name;
@@ -241,8 +244,8 @@ export default {
       }else{
         console.log(this.province_id,this.city_id,this.university_id)
         let params = {
-          // uid: this.$store.state.uid,
-          uid: '1087',
+          uid: this.$store.state.uid,
+          // uid: '1087',
           user_image: this.user_image,
           name: this.userName,
           share_qrcode: this.share_qrcode,
@@ -282,16 +285,40 @@ export default {
     unpreview(){
       this.preFlag = false; //取消预览
     },
-    uploadImg() {
+    chooseImg() {
+      let that = this;
       console.log("上传图片")
-      this.$wx.chooseImage({
+      that.$wx.chooseImage({
         count: 1,
         sizeType: ['compressed'],
         sourceType: ['album', 'camera'],
         success (res) {
-          // tempFilePath可以作为img标签的src属性显示图片
-          const tempFilePaths = res.tempFilePaths
-          console.log(tempFilePaths)
+          let localIds = res.localIds[0];
+          console.log('生成的临时路径',localIds);
+          that.user_image = localIds;
+          console.log("本地临时路径",that.user_image)
+          setTimeout(()=>{
+            that.$wx.uploadImage({
+              localId: localIds,
+              isShowProgressTips: 1,
+              success: function(res){
+                console.log("上传图片回调",res)
+                // let mediaId = res.serverId;
+                let params = { serverId: res.serverId }
+                console.log("上传图片传参",params)
+                http.uploadImage(params).then(res=>{
+                  console.log('上传回调',res)
+                  that.user_image = res.url;
+                })
+              },
+              fail:function(err){
+                console.log("上传失败回调",err)
+              }
+            })
+          },100)
+        },
+        fail(err){
+          console.log("错误",err)
         }
       })
     }
@@ -300,8 +327,9 @@ export default {
     this.init()
   },
   mounted(){
-    // let uid = this.$store.state.uid;
-    let uid = '1087';
+    console.log(this.number)
+    let uid = this.$store.state.uid;
+    // let uid = '1087';
     this.number = uid;
     this.getUserInfo(this.number);
     this.getAllProvince();

@@ -63,7 +63,7 @@ export default {
       //   useCORS: true
       // }
       if(this.userInfo.share_qrcode){
-        this.getUrlBase64(this.userInfo.share_qrcode,res=>{
+        this.getUrlBase64(108,108,this.userInfo.share_qrcode,res=>{
           this.userInfo.share_qrcode = res;
           html2canvas(this.$refs.imageWrapper,{
             backgroundColor: null, //解决生成会有白边的可能
@@ -86,16 +86,16 @@ export default {
       }
       
     },
-    getUrlBase64(url, callback) { //网络资源图片转成base64
+    getUrlBase64(width,height,url, callback) { //网络资源图片转成base64
       var canvas = document.createElement("canvas");   //创建canvas DOM元素
       var ctx = canvas.getContext("2d");
       var img = new Image;
       img.crossOrigin = 'Anonymous';
       img.src = url;
       img.onload = function () {
-          canvas.height = 108; //指定画板的高度,自定义
-          canvas.width = 108; //指定画板的宽度，自定义
-          ctx.drawImage(img, 0, 0, 108, 108); //参数可自定义
+          canvas.height = width; //指定画板的高度,自定义
+          canvas.width = height; //指定画板的宽度，自定义
+          ctx.drawImage(img, 0, 0, width, height); //参数可自定义
           var dataURL = canvas.toDataURL("image/");
           callback.call(this, dataURL); //回掉函数获取Base64编码
           canvas = null;

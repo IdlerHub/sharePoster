@@ -15,17 +15,22 @@ export default {
       musicFlag: true //true: 当前正在播放
     };
   },
+  created(){
+    this.init();
+    // if (process.env.NODE_ENV == "development") {
+    //   this.init();
+    // } else {
+    //   this.$wx.miniProgram.getEnv(res => {
+    //     console.log("mini")
+    //     if (res.miniprogram) {
+    //       this.init();
+    //     }
+    //   });
+    // }
+  },
   mounted(){
-    if (process.env.NODE_ENV == "development") {
-      this.init();
-    } else {
-      this.$wx.miniProgram.getEnv(res => {
-        console.log("mini")
-        if (res.miniprogram) {
-          this.init();
-        }
-      });
-    }
+    this.$refs.MusicPlay.play();
+    this.musicFlag = true;
   },
   beforeDestroy(){
     //销毁前关掉音乐
@@ -38,8 +43,6 @@ export default {
       const uid = this.$utils.getQueryString("uid");
       console.log(11111,uid);
       this.$store.commit("setUid", { uid });
-      this.$refs.MusicPlay.play();
-      this.musicFlag = true;
     },
     setMusic(){
       this.musicFlag = !this.musicFlag;
