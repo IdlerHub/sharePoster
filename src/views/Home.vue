@@ -40,7 +40,7 @@
         <div class="user-info">
           <div class="info">照片</div>
           
-          <div class="upload" @click="chooseImg">
+          <div class="upload" @click="chooseImg" v-show="!user_image">
             <img class="upload-add" src="@/images/add-img.png" alt />
             <div>点击上传</div>
             <div>本人照片</div>
@@ -60,7 +60,7 @@
             <img :src="user_image" alt="" />
           </div>
 -->
-          <div class="preview" @click="preview" v-if="user_image.length">
+          <div class="preview" @click="preview" v-if="user_image">
             <img :src="user_image" alt="" />
             <img class="del" src="@/images/del-img.png" alt @click="delImg" />
           </div>
@@ -83,6 +83,7 @@ export default {
       user_image: '',   //用户头像地址
       userName: '',
       user_createtime: 0,
+      study_day: 0,   //创建天数
       share_qrcode: '',
       userSchool: '请选择',
       province_id: 0, //当前省份id
@@ -131,6 +132,7 @@ export default {
           jsApiList: [
             'updateAppMessageShareData',
             'chooseImage',
+            'getLocalImgData',
             'previewImage',
             'uploadImage'
           ] // 必填，需要使用的JS接口列表
@@ -230,6 +232,7 @@ export default {
         this.city_id = res.city_id;
         this.university_id = res.university;
         this.user_createtime = res.user_createtime;
+        this.study_day = res.study_day;
       })
     },
     next() {
@@ -251,6 +254,7 @@ export default {
           share_qrcode: this.share_qrcode,
           userSchool: this.userSchool,
           number: this.number,
+          study_day: this.study_day,
           province_id: this.province_id,
           city_id: this.city_id,
           university: this.university_id,
@@ -273,6 +277,10 @@ export default {
       reader.onerror = function (error) {
         console.log('Error: ', error)
       }
+      // this.$wx.previewImage({
+      //   current: '',
+      //   urls:
+      // })
     },
     delImg(){ //删除图片
       this.user_image = ''
@@ -293,13 +301,19 @@ export default {
         sizeType: ['compressed'],
         sourceType: ['album', 'camera'],
         success (res) {
-          let localIds = res.localIds[0];
-          console.log('生成的临时路径',localIds);
-          that.user_image = localIds;
-          console.log("本地临时路径",that.user_image)
+          let localIds = res.localIds;
+          console.log("localId",localIds)
+          that.$wx.getLocalImgData({
+            localId: localIds[0], // 图片的localID
+            success: function (res) {
+              var localData = res.localData; // localData是图片的base64数据，可以用img标签显示
+              that.user_image = localData;
+              console.log("本地base64",res)
+            }
+          });
           setTimeout(()=>{
             that.$wx.uploadImage({
-              localId: localIds,
+              localId: localIds[0],
               isShowProgressTips: 1,
               success: function(res){
                 console.log("上传图片回调",res)
@@ -308,7 +322,6 @@ export default {
                 console.log("上传图片传参",params)
                 http.uploadImage(params).then(res=>{
                   console.log('上传回调',res)
-                  that.user_image = res.url;
                 })
               },
               fail:function(err){

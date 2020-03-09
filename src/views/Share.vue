@@ -18,7 +18,7 @@
             <div class="info-content">在网上老年大学</div>
             <div class="info-content">
               <span>学习</span>
-              <span>{{userInfo.number}}</span>
+              <span>{{userInfo.study_day}}</span>
               <span>天啦</span>
             </div>
           </div>
