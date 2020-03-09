@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" @click.once.prevent="music">
     <div class="audio">
       <audio
         src="@/assets/music.mp3"
@@ -47,8 +47,10 @@ export default {
     // }
   },
   mounted() {
-    this.$refs.MusicPlay.play();
-    this.musicFlag = true;
+    // this.$wx.ready(function () {
+    //   this.$refs.MusicPlay.play();
+    //   this.musicFlag = true;
+    // })
   },
   beforeDestroy() {
     //销毁前关掉音乐
@@ -61,6 +63,10 @@ export default {
       const uid = this.$utils.getQueryString("uid");
       console.log("uid", uid);
       this.$store.commit("setUid", { uid });
+    },
+    music(){
+      this.$refs.MusicPlay.play();
+      this.musicFlag = true;
     },
     setMusic() {
       this.musicFlag = !this.musicFlag;
@@ -93,7 +99,7 @@ body {
   width: 100%;
   height: 35px;
   position: absolute;
-  top: 12px;
+  top: 28px;
   right: 26.5px;
   // top: 12px;
   // right: 12.5px;

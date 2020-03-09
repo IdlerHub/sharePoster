@@ -51,6 +51,7 @@ export default {
   mounted() {
     // localStorage.getItem('userInfo')
     this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    this.$toast("长按海报发送给好友")
     console.log(this.userInfo);
     this.toImage();
   },
@@ -62,17 +63,13 @@ export default {
       //   useCORS: true
       // }
       if (this.userInfo.share_qrcode) {
-        this.getUrlBase64(108, 108, this.userInfo.share_qrcode, res => {
+        this.getUrlBase64(this.userInfo.share_qrcode, res => {
           this.userInfo.share_qrcode = res;
           html2canvas(this.$refs.imageWrapper, {
             backgroundColor: null, //解决生成会有白边的可能
             allowTaint: true, //是否允许跨域图片(官方文档,代试验)
             useCORS: true,
             taintTest: true
-            // onrendered: function(cnavas){
-            //   let dataURL = canvas.toDataURL("image/png");
-            //   that.dataURL = dataURL;
-            // }
           }).then(canvas => {
             console.log("生成", canvas);
             // this.$refs.imageWrapper.appendChild(canvas)
@@ -82,7 +79,7 @@ export default {
         });
       }
     },
-    getUrlBase64(width, height, url, callback) {
+    getUrlBase64(url, callback) {
       //网络资源图片转成base64
       var canvas = document.createElement("canvas"); //创建canvas DOM元素
       var ctx = canvas.getContext("2d");
@@ -90,9 +87,9 @@ export default {
       img.crossOrigin = "Anonymous";
       img.src = url;
       img.onload = function() {
-        canvas.height = width; //指定画板的高度,自定义
-        canvas.width = height; //指定画板的宽度，自定义
-        ctx.drawImage(img, 0, 0, width, height); //参数可自定义
+        canvas.height = 108; //指定画板的高度,自定义
+        canvas.width = 108; //指定画板的宽度，自定义
+        ctx.drawImage(img, 0, 0, 108, 108); //参数可自定义
         var dataURL = canvas.toDataURL("image/");
         callback.call(this, dataURL); //回掉函数获取Base64编码
         canvas = null;
