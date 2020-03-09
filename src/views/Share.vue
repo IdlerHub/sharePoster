@@ -9,22 +9,22 @@
           <div class="canvas-info">
             <div class="info-content">
               <span>我叫</span>
-              <span>{{userInfo.name}}</span>
+              <span>{{ userInfo.name }}</span>
             </div>
             <div class="info-content">
               <span>来自</span>
-              <span>{{userInfo.userSchool}}</span>
+              <span>{{ userInfo.userSchool }}</span>
             </div>
             <div class="info-content">在网上老年大学</div>
             <div class="info-content">
               <span>学习</span>
-              <span>{{userInfo.study_day}}</span>
+              <span>{{ userInfo.study_day }}</span>
               <span>天啦</span>
             </div>
           </div>
           <div class="canvas-footer">
             <div class="canvas-user">
-              <img :src="userInfo.user_image" alt >
+              <img :src="userInfo.user_image" alt />
             </div>
           </div>
           <div class="canvas-er">
@@ -32,28 +32,27 @@
             <div class="text">长按识别二维码</div>
             <div class="text">和好友一起学习</div>
           </div>
-          
         </div>
       </slot>
     </div>
   </div>
 </template>
 <script>
-import html2canvas from 'html2canvas'
+import html2canvas from "html2canvas";
 export default {
   name: "share",
-  data(){ 
+  data() {
     return {
       userInfo: {},
-      dataURL: '',
-      ercode: ''
+      dataURL: "",
+      ercode: ""
     };
   },
-  mounted(){
+  mounted() {
     // localStorage.getItem('userInfo')
-    this.userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    console.log(this.userInfo)
-    this.toImage()
+    this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    console.log(this.userInfo);
+    this.toImage();
   },
   methods: {
     toImage() {
@@ -62,43 +61,41 @@ export default {
       //   allowTaint: true,  //是否允许跨域图片(官方文档,代试验)
       //   useCORS: true
       // }
-      if(this.userInfo.share_qrcode){
-        this.getUrlBase64(108,108,this.userInfo.share_qrcode,res=>{
+      if (this.userInfo.share_qrcode) {
+        this.getUrlBase64(108, 108, this.userInfo.share_qrcode, res => {
           this.userInfo.share_qrcode = res;
-          html2canvas(this.$refs.imageWrapper,{
+          html2canvas(this.$refs.imageWrapper, {
             backgroundColor: null, //解决生成会有白边的可能
-            allowTaint: true,  //是否允许跨域图片(官方文档,代试验)
+            allowTaint: true, //是否允许跨域图片(官方文档,代试验)
             useCORS: true,
             taintTest: true
             // onrendered: function(cnavas){
             //   let dataURL = canvas.toDataURL("image/png");
             //   that.dataURL = dataURL;
             // }
-          }).then((canvas) => {
-            console.log('生成',canvas)
+          }).then(canvas => {
+            console.log("生成", canvas);
             // this.$refs.imageWrapper.appendChild(canvas)
             let dataURL = canvas.toDataURL("image/png");
             this.dataURL = dataURL;
           });
-        })
-
-        
+        });
       }
-      
     },
-    getUrlBase64(width,height,url, callback) { //网络资源图片转成base64
-      var canvas = document.createElement("canvas");   //创建canvas DOM元素
+    getUrlBase64(width, height, url, callback) {
+      //网络资源图片转成base64
+      var canvas = document.createElement("canvas"); //创建canvas DOM元素
       var ctx = canvas.getContext("2d");
-      var img = new Image;
-      img.crossOrigin = 'Anonymous';
+      var img = new Image();
+      img.crossOrigin = "Anonymous";
       img.src = url;
-      img.onload = function () {
-          canvas.height = width; //指定画板的高度,自定义
-          canvas.width = height; //指定画板的宽度，自定义
-          ctx.drawImage(img, 0, 0, width, height); //参数可自定义
-          var dataURL = canvas.toDataURL("image/");
-          callback.call(this, dataURL); //回掉函数获取Base64编码
-          canvas = null;
+      img.onload = function() {
+        canvas.height = width; //指定画板的高度,自定义
+        canvas.width = height; //指定画板的宽度，自定义
+        ctx.drawImage(img, 0, 0, width, height); //参数可自定义
+        var dataURL = canvas.toDataURL("image/");
+        callback.call(this, dataURL); //回掉函数获取Base64编码
+        canvas = null;
       };
     }
   }
@@ -106,9 +103,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.share{
-  .imageWrapper{
-    .real_pic{
+.share {
+  .imageWrapper {
+    .real_pic {
       width: 100%;
       height: 100%;
       position: fixed;
@@ -121,84 +118,83 @@ export default {
     }
   }
 }
-  .canvas-bg{
-    min-height: 100vh;
-    padding-top: 3.40625rem /* 54.5/16 */;
-    padding-left: 1.875rem;
-    background: url('../images/canvas-bg.png') no-repeat;
-    background-size: 100% 100%;
-    position: relative;
-    .canvas-title{
-      width: 13.35rem;
-      height: 8.35rem;
-      // margin-left: 1.875rem /* 30/16 */;
-      margin-bottom: 2.15625rem;
-    }
-    .canvas-info{
-      // margin-left: 1.875rem /* 30/16 */;
-      font-size:1.1875rem;
-      font-family:Source Han Sans CN;
-      font-weight:400;
-      color:rgba(255,255,255,1);
-      margin-bottom: 45.5px;
-      .info-content{
-        margin-bottom: .8125rem;
-        & span:nth-child(2){
-          font-size:1.1875rem;
-          font-family:Source Han Sans CN;
-          font-weight:bold;
-          color:rgba(254,207,84,1);
-          margin-left: 5px;
-          margin-right: 5px;
-        }
-      }
-    }
-    .canvas-er{
-      max-width: 108px;
-      padding-bottom: 5.90625rem /* 94.5/16 */;
-      z-index: 99;
-      img{
-        width: 100%;
-        height: 100%;
-        margin-bottom: 1.0625rem /* 17/16 */;
-        background: white;
-        border-radius: 5px;
-        overflow: hidden;
-      }
-      .text{
-        font-size: 15px;
-        font-family:Source Han Sans CN;
-        font-weight:400;
-        color:rgba(255,255,255,1);
-        text-align: center;
-      }
-    }
-    .canvas-footer{
-      // width: 58.1%;
-      // height: 42.4%;
-      width: 218px;
-      height: 349.5px;
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      background: url('../images/canvas-people.png') no-repeat;
-      background-size: 100% 100%;
-      border: none;
-      .canvas-user{
-        position: absolute;
-        top: -4.5px /* 5/16 */;
-        right: 27px /* 26/16 */;
-        width: 90px /* 94.2/16 */;
-        height: 90px;
-        border: 2px solid rgba(255,255,255,1);
-        border-radius: 100%;
-        overflow: hidden;
-        img{
-          width: 100%;
-          height: 100%;
-        }
+.canvas-bg {
+  min-height: 100vh;
+  padding-top: 3.40625rem /* 54.5/16 */;
+  padding-left: 1.875rem;
+  background: url("../images/canvas-bg.png") no-repeat;
+  background-size: 100% 100%;
+  position: relative;
+  .canvas-title {
+    width: 13.35rem;
+    height: 8.35rem;
+    // margin-left: 1.875rem /* 30/16 */;
+    margin-bottom: 2.15625rem;
+  }
+  .canvas-info {
+    // margin-left: 1.875rem /* 30/16 */;
+    font-size: 1.1875rem;
+    font-family: Source Han Sans CN;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 1);
+    margin-bottom: 45.5px;
+    .info-content {
+      margin-bottom: 0.8125rem;
+      & span:nth-child(2) {
+        font-size: 1.1875rem;
+        font-family: Source Han Sans CN;
+        font-weight: bold;
+        color: rgba(254, 207, 84, 1);
+        margin-left: 5px;
+        margin-right: 5px;
       }
     }
   }
-
+  .canvas-er {
+    max-width: 108px;
+    padding-bottom: 5.90625rem /* 94.5/16 */;
+    z-index: 99;
+    img {
+      width: 100%;
+      height: 100%;
+      margin-bottom: 1.0625rem /* 17/16 */;
+      background: white;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .text {
+      font-size: 15px;
+      font-family: Source Han Sans CN;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 1);
+      text-align: center;
+    }
+  }
+  .canvas-footer {
+    // width: 58.1%;
+    // height: 42.4%;
+    width: 218px;
+    height: 349.5px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: url("../images/canvas-people.png") no-repeat;
+    background-size: 100% 100%;
+    border: none;
+    .canvas-user {
+      position: absolute;
+      top: -4.5px /* 5/16 */;
+      right: 27px /* 26/16 */;
+      width: 90px /* 94.2/16 */;
+      height: 90px;
+      border: 2px solid rgba(255, 255, 255, 1);
+      border-radius: 100%;
+      overflow: hidden;
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}
 </style>
