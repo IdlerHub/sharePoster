@@ -21,6 +21,14 @@ const routes = [
     meta: {
       title: "海报分享"
     }
+  },
+  {
+    path: "/client",
+    name: "client",
+    component: () => import("../views/Client.vue"),
+    meta: {
+      title: "终端错误"
+    }
   }
 ];
 
@@ -32,9 +40,8 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (!getIsWxClient()) {
-    /* next({ path: "/client" }); */
+    next({ path: "/client" });
   }
-
   next();
 });
 

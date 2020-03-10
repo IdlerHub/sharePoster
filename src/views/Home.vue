@@ -16,7 +16,7 @@
       <div class="container">
         <div class="user-info">
           <div class="info">姓名</div>
-          <input type="text" placeholder="请输入本人姓名" v-model="userName" />
+          <input type="text" maxlength="5" placeholder="请输入本人姓名" v-model="userName" />
         </div>
         <div class="user-info">
           <div class="info">学校</div>
@@ -38,7 +38,7 @@
             />
           </van-popup>
         </div>
-        <div class="user-info">
+        <div class="user-info" :style="display" id="photo" ref="Photo">
           <div class="info">照片</div>
           <div class="upload" @click="chooseImg" v-show="!user_image">
             <img class="upload-add" src="@/images/add-img.png" alt />
@@ -53,7 +53,7 @@
             <img :src="user_image" alt="" />
           </div>
         </div>
-        <div class="submit-img" @click="next"></div>
+        <div class="submit-img" :style="display" @click="next"></div>
       </div>
     </div>
   </div>
@@ -65,7 +65,8 @@ export default {
   name: "home",
   data() {
     return {
-      number: "999",
+      display: '',
+      number: "",
       preFlag: false, //图片预览
       showFlag: false,
       user_image: "", //用户头像地址
@@ -112,7 +113,7 @@ export default {
       http.getJsConfig(params).then(res => {
         console.log(res);
         this.$wx.config({
-          debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+          debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
           appId: "wxbd85dc45a5a84cd8", // 必填，公众号的唯一标识
           timestamp: res.timestamp, // 必填，生成签名的时间戳
           nonceStr: res.nonceStr, // 必填，生成签名的随机串
@@ -205,12 +206,15 @@ export default {
       });
     },
     putUserInfo(params) {
+      let that = this;
       http.putUserInfo(params).then(res => {
-        console.log(res);
+        localStorage.setItem("userInfo", JSON.stringify(params));
+        that.$router.replace({ path: "/share" });
+        console.log("请求成功",res)
       });
     },
-    getUserInfo() {
-      let uid = this.number;
+    getUserInfo(uid) {
+      this.number = uid;
       let params = { uid };
       console.log(uid)
       http.getUserInfo(params).then(res => {
@@ -252,8 +256,6 @@ export default {
 
         };
         this.putUserInfo(params);
-        localStorage.setItem("userInfo", JSON.stringify(params));
-        this.$router.replace({ path: "/share" });
       }
     },
     previewImg(event) {
@@ -332,17 +334,49 @@ export default {
           console.log("错误", err);
         }
       });
+    },
+    androidFcous(){
+      const u = navigator.userAgent;
+      let that = this;
+      if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1) { //安卓手机
+        console.log("安卓手机触发")
+        // 获取视图原始高度
+        let screenHeight = document.body.offsetHeight;
+        // 为window绑定resize事件
+        window.onresize = function() {
+          let nowHeight = document.body.offsetHeight;
+          if (nowHeight < screenHeight) {
+            // 将底部弹起的按钮隐藏（可使用给按钮添加相应消失类）
+            console.log("弹起,页面变小了",nowHeight)
+            console.log("修改",that.$refs.Photo)
+            that.display = "display: none";
+            // that.$refs.Photo.style.display = "none";
+          } else {
+            // 将按钮正常显示（可使用给按钮移除相应消失类）
+            console.log("弹起,没有变化",nowHeight)
+            console.log("修改",that.$refs.Photo)
+            that.display = "";
+            // that.$refs.Photo.style.display = "block";
+          }
+        }
+      }
+      // let that = this;
     }
   },
   created() {
     this.init();
   },
   mounted() {
-    console.log(this.number);
-    let uid = this.$store.state.uid;
-    this.number = uid;
-    this.getUserInfo(this.number);
+    console.log('home.vue',this.number);
+    this.$store.state.uid && this.getUserInfo(this.$store.state.uid);
     this.getAllProvince();
+    this.androidFcous()
+  },
+  watch:{
+    "$store.state.uid"(nVal){
+      console.log("watch")
+      if(nVal) this.getUserInfo(nVal);
+    }
   }
 };
 </script>
@@ -353,6 +387,7 @@ export default {
   flex-direction: column;
   width: 100%;
   height: 100%;
+  min-height: 100vh;
   position: relative;
   .poster-bg {
     width: 100%;
@@ -480,8 +515,8 @@ export default {
           }
         }
         .upload {
-          width: 95px;
-          height: 95px; //5.0625rem
+          width: 5.9375rem /* 95/16 */;
+          height: 5.9375rem; 
           border: 1px solid #d00000;
           border-radius: 5px;
           display: flex;
@@ -573,7 +608,7 @@ export default {
     margin-bottom: .5rem;
   }
 }
-@media screen and (max-height: 568px){
+@media screen and (max-height: 568px){  //iphone5
   .home .content .title{
     margin-top: 3.0938rem /* 49.5/16 */;
   }

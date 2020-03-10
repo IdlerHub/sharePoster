@@ -1,5 +1,5 @@
 <template>
-  <div id="app" @click.once.prevent="music">
+  <div id="app">
     <div class="audio">
       <audio
         src="@/assets/music.mp3"
@@ -34,17 +34,21 @@ export default {
     };
   },
   created() {
-    this.init();
-    // if (process.env.NODE_ENV == "development") {
-    //   this.init();
-    // } else {
-    //   this.$wx.miniProgram.getEnv(res => {
-    //     console.log("mini")
-    //     if (res.miniprogram) {
-    //       this.init();
-    //     }
-    //   });
-    // }
+    // this.init();
+    // this.autoplay();
+    if (process.env.NODE_ENV == "development") {
+      this.init();
+      this.autoplay();
+    } else {
+      this.$wx.miniProgram.getEnv(res => {
+        console.log("mini")
+        if (res.miniprogram) {
+          console.log("app.vue")
+          this.init();
+          this.autoplay();
+        }
+      });
+    }
   },
   beforeDestroy() {
     //销毁前关掉音乐
@@ -58,9 +62,34 @@ export default {
       console.log("uid", uid);
       this.$store.commit("setUid", { uid });
     },
-    music(){
-      this.$refs.MusicPlay.play();
-      this.musicFlag = true;
+    // music(){
+    //   this.$refs.MusicPlay.play();
+    //   this.musicFlag = true;
+    // },
+    autoplay() {
+      let audio = this.$refs.MusicPlay;
+      this.$wx.miniProgram.getEnv(res => {
+        if (res.miniprogram) {
+          audio.play();
+          this.musicFlag = true;
+          audio.volume = 0.8;
+        }
+      });
+      document.addEventListener("visibilitychange", () => {
+        console.log(document.hidden);
+        if (document.hidden) {
+          console.log("页面隐藏")
+          audio.pause();
+          // this.musicFlag = false;
+        } else {
+          if(this.musicFlag) {
+            setTimeout(() => {
+              audio.play();
+              this.musicFlag = true;
+            }, 2000);
+          }
+        }
+      });
     },
     setMusic() {
       this.musicFlag = !this.musicFlag;
@@ -70,7 +99,20 @@ export default {
       } else {
         this.$refs.MusicPlay.play();
       }
-    }
+    },
+    // shareReady(){
+    //   this.$wx.ready(()=>{
+    //     wx.updateAppMessageShareData({ 
+    //       title: '', // 分享标题
+    //       desc: '', // 分享描述
+    //       link: '', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+    //       imgUrl: '', // 分享图标
+    //       success: function () {
+    //         // 设置成功
+    //       }
+    //     })
+    //   })
+    // }
   }
 };
 </script>

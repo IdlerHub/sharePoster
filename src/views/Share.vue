@@ -53,9 +53,9 @@ export default {
     this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
     this.$toast("长按海报发送给好友")
     console.log(this.userInfo);
-    setTimeout(()=>{
+    // setTimeout(()=>{
       this.toImage();
-    },1000)
+    // },100)
   },
   methods: {
     toImage() {
@@ -65,9 +65,11 @@ export default {
       //   useCORS: true
       // }
       if (this.userInfo.share_qrcode) {
+        console.log("存在二维码")
         this.getUrlBase64(this.userInfo.share_qrcode, res => {
+          console.log("二维码转换")
           this.userInfo.share_qrcode = res;
-          // setTimeout(()=>{
+          setTimeout(()=>{
             html2canvas(this.$refs.imageWrapper, {
               backgroundColor: null, //解决生成会有白边的可能
               allowTaint: true, //是否允许跨域图片(官方文档,代试验)
@@ -78,8 +80,11 @@ export default {
               // this.$refs.imageWrapper.appendChild(canvas)
               let dataURL = canvas.toDataURL("image/png");
               this.dataURL = dataURL;
+              this.ready(dataURL);
+            }).catch(err=>{
+              console.log(err)
             });
-          // },100)
+          },100)
         });
       }
     },
@@ -97,7 +102,24 @@ export default {
         var dataURL = canvas.toDataURL("image/");
         callback.call(this, dataURL); //回掉函数获取Base64编码
         canvas = null;
-      };
+      }
+    },
+    ready(dataURL){
+      let that = this;
+      console.log("wx.ready")
+      that.$wx.ready(()=>{
+        console.log("wx.updateAppMessageShareData")
+        that.$wx.updateAppMessageShareData({ 
+          title: '网上老年大学', // 分享标题
+          desc: '快来加入老年大学,一起学习吧', // 分享描述
+          link: 'https://studyreport.jinlingkeji.cn/', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+          imgUrl: dataURL, // 分享图标
+          success: function () {
+            // 设置成功
+            console.log("success")
+          }
+        })
+      })
     }
   }
 };
@@ -168,7 +190,7 @@ export default {
       overflow: hidden;
     }
     .text {
-      font-size: 15px;
+      font-size: .9375rem /* 15/16 */;
       font-family: Source Han Sans CN;
       font-weight: 400;
       color: rgba(255, 255, 255, 1);
