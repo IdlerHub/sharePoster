@@ -18,7 +18,7 @@
             <div class="info-content">在网上老年大学</div>
             <div class="info-content">
               <span>学习</span>
-              <span>{{ userInfo.study_day }}</span>
+              <span class="study-day">{{ userInfo.study_day }}</span>
               <span>天啦</span>
             </div>
           </div>
@@ -29,8 +29,8 @@
           </div>
           <div class="canvas-er">
             <img :src="userInfo.share_qrcode" alt />
-            <div class="text">长按识别二维码</div>
-            <div class="text">和好友一起学习</div>
+            <div class="text">长按保存图片</div>
+            <div class="text">扫码一起学习</div>
           </div>
         </div>
       </slot>
@@ -56,11 +56,13 @@ export default {
   },
   methods: {
     toImage() {
-      if (this.userInfo.share_qrcode) {
-        this.getUrlBase64_pro(this.userInfo.user_image).then(res => {
-          this.userInfo.user_image = res;
-          this.getUrlBase64(this.userInfo.share_qrcode, res => {
-            this.userInfo.share_qrcode = res;
+      let that = this;
+      Promise.all([that.getUrlBase64_pro(108,this.userInfo.share_qrcode),
+        that.getUrlBase64_pro(94.2,this.userInfo.user_image)])
+          .then(res=>{
+            console.log("海报",res);
+            this.userInfo.share_qrcode = res[0];
+            this.userInfo.user_image = res[1];
             setTimeout(() => {
               html2canvas(this.$refs.imageWrapper, {
                 backgroundColor: null, //解决生成会有白边的可能
@@ -74,31 +76,13 @@ export default {
                   this.dataURL = dataURL;
                   this.ready(dataURL);
                 })
-                .catch(err => {
-                  console.log(err);
-                });
-            }, 100);
-          });
-        });
-      }
+            }, 1000);
+        })
+        .catch(err=>{
+          console.log('生成catch', err);
+        })
     },
-    getUrlBase64(url, callback) {
-      //网络资源图片转成base64
-      var canvas = document.createElement("canvas"); //创建canvas DOM元素
-      var ctx = canvas.getContext("2d");
-      var img = new Image();
-      img.crossOrigin = "Anonymous";
-      img.src = url;
-      img.onload = function() {
-        canvas.height = 108; //指定画板的高度,自定义
-        canvas.width = 108; //指定画板的宽度，自定义
-        ctx.drawImage(img, 0, 0, 108, 108); //参数可自定义
-        var dataURL = canvas.toDataURL("image/");
-        callback.call(this, dataURL); //回掉函数获取Base64编码
-        canvas = null;
-      };
-    },
-    getUrlBase64_pro(url) {
+    getUrlBase64_pro(len,url) {
       //网络资源图片转成base64
       var canvas = document.createElement("canvas"); //创建canvas DOM元素
       var ctx = canvas.getContext("2d");
@@ -106,9 +90,9 @@ export default {
         var img = new Image();
         img.crossOrigin = "Anonymous";
         img.onload = function() {
-          canvas.height = 94.2; //指定画板的高度,自定义
-          canvas.width = 94.2; //指定画板的宽度，自定义
-          ctx.drawImage(img, 0, 0, 94.2, 94.2); //参数可自定义
+          canvas.height = len; //指定画板的高度,自定义
+          canvas.width = len; //指定画板的宽度，自定义
+          ctx.drawImage(img, 0, 0, len, len); //参数可自定义
           var dataURL = canvas.toDataURL("image/");
           canvas = null;
           reslove(dataURL);
@@ -160,9 +144,6 @@ export default {
   min-height: 100%;
   padding-top: 3.40625rem /* 54.5/16 */;
   padding-left: 1.875rem;
-  // background: url("../images/canvas-bg.png") no-repeat;
-  // background-size: 100% 100%;
-  // position: relative;
   .canvas-title {
     // width: 13.35rem;
     // height: 8.35rem;
@@ -181,12 +162,15 @@ export default {
     .info-content {
       margin-bottom: 0.5125rem; /* 30/16 */
       & span:nth-child(2) {
-        font-size: 1.1875rem;
+        font-size: 1.1875rem /* 19/16 */;
         font-family: Source Han Sans CN;
         font-weight: bold;
         color: rgba(254, 207, 84, 1);
         margin-left: 5px;
         margin-right: 5px;
+      }
+      .study-day{
+        font-size: 1.5rem !important;
       }
     }
   }

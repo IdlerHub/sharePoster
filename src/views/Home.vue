@@ -214,7 +214,7 @@ export default {
         .putUserInfo(params)
         .then(res => {
           localStorage.setItem("userInfo", JSON.stringify(params));
-          that.$router.replace({ path: "/share" });
+          that.$router.push({ path: "/share" });
           console.log(res);
         })
         .catch(err => {
@@ -273,10 +273,6 @@ export default {
       reader.onerror = function(error) {
         console.log("Error: ", error);
       };
-      // this.$wx.previewImage({
-      //   current: '',
-      //   urls:
-      // })
     },
     delImg() {
       //删除图片
@@ -293,6 +289,7 @@ export default {
     },
     chooseImg() {
       let that = this;
+      this.$toast("这里的头像将作为您的海报头像哦");
       that.$wx.chooseImage({
         count: 1,
         sizeType: ["compressed"],
@@ -321,8 +318,7 @@ export default {
         }
       });
     },
-    scrollTop() {
-      //苹果手机键盘弹起产生多余块
+    scrollTop() {//苹果手机键盘弹起产生多余块
       window.scroll(0, 0);
     },
     androidFcous() {

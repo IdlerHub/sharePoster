@@ -11,7 +11,7 @@ const routes = [
     name: "home",
     component: Home,
     meta: {
-      title: "首页"
+      title: "学习报告"
     }
   },
   {
