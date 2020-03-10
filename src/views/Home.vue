@@ -16,7 +16,7 @@
       <div class="container">
         <div class="user-info">
           <div class="info">姓名</div>
-          <input type="text" maxlength="5" placeholder="请输入本人姓名" v-model="userName" />
+          <input type="text" maxlength="8" placeholder="请输入本人姓名" v-model="userName" @blur="scrollTop" />
         </div>
         <div class="user-info">
           <div class="info">学校</div>
@@ -38,7 +38,7 @@
             />
           </van-popup>
         </div>
-        <div class="user-info" :style="display" id="photo" ref="Photo">
+        <div class="user-info" :style="display">
           <div class="info">照片</div>
           <div class="upload" @click="chooseImg" v-show="!user_image">
             <img class="upload-add" src="@/images/add-img.png" alt />
@@ -46,7 +46,7 @@
             <div>本人照片</div>
           </div>
           <div class="preview" @click="preview" v-if="user_image">
-            <img :src="user_image" alt="" />
+            <img class="user-img" :src="user_image" alt="" />
             <img class="del" src="@/images/del-img.png" alt @click="delImg" />
           </div>
           <div v-show="preFlag" class="watch-img" @click="unpreview" @touchmove.prevent.stop>
@@ -211,6 +211,9 @@ export default {
         localStorage.setItem("userInfo", JSON.stringify(params));
         that.$router.replace({ path: "/share" });
         console.log("请求成功",res)
+      }).catch(err=>{
+        this.$toast("网络错误,请重新操作")
+        console.log(err)
       });
     },
     getUserInfo(uid) {
@@ -335,6 +338,13 @@ export default {
         }
       });
     },
+    scrollTop(){
+      console.log("失去焦点")
+        window.scroll(0, 0);
+      // document.getElementById("#user_name").blur(()=>{
+      //   consnole.log("失去聚焦")
+      // })
+    },
     androidFcous(){
       const u = navigator.userAgent;
       let that = this;
@@ -348,17 +358,18 @@ export default {
           if (nowHeight < screenHeight) {
             // 将底部弹起的按钮隐藏（可使用给按钮添加相应消失类）
             console.log("弹起,页面变小了",nowHeight)
-            console.log("修改",that.$refs.Photo)
             that.display = "display: none";
             // that.$refs.Photo.style.display = "none";
           } else {
             // 将按钮正常显示（可使用给按钮移除相应消失类）
             console.log("弹起,没有变化",nowHeight)
-            console.log("修改",that.$refs.Photo)
             that.display = "";
             // that.$refs.Photo.style.display = "block";
           }
         }
+      }else{
+        console.log("苹果手机")
+        
       }
       // let that = this;
     }
@@ -458,8 +469,8 @@ export default {
         }
         .info-school {
           width: 76.82%;
-          height: 2.5rem;
-          line-height: 2.5rem;
+          height: 2.625rem;
+          line-height: 2.625rem;
           border: 1px solid #d42220;
           border-radius: 0.3125rem;
           color: #d42220;
@@ -549,19 +560,21 @@ export default {
         .preview {
           width: 5.9375rem /* 95/16 */;
           height: 5.9375rem /* 95/16 */;
-          border: 1px solid #d00000;
-          border-radius: 5px;
+          // border: 1px solid #d00000;
+          // border-radius: 5px;
           position: relative;
-          img {
-            width: 100%;
-            height: 100%;
+          .user-img {
+            width: 5.9375rem /* 95/16 */;
+            height: 5.9375rem /* 95/16 */;
+            border: 1px solid #d00000;
+            border-radius: 5px;
           }
           .del {
-            width: 24px;
-            height: 24px;
+            width: 1.5rem /* 24/16 */;
+            height: 1.5rem /* 24/16 */;
             position: absolute;
-            top: -9.5px;
-            right: -10px;
+            top: -0.59375rem;
+            right: -.625rem /* 10/16 */;
             z-index: 2;
           }
         }
@@ -602,10 +615,10 @@ export default {
     margin-top: 2.5rem /* 40/16 */;
   }
   .home .content .container{
-    margin-top: .625rem /* 10/16 */;
+    margin-top: .425rem /* 10/16 */;
   }
   .home .content .container .user-info{
-    margin-bottom: .5rem;
+    margin-bottom: .4rem;
   }
 }
 @media screen and (max-height: 568px){  //iphone5

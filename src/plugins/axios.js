@@ -48,6 +48,7 @@ _axios.interceptors.response.use(
   },
   function(error) {
     // Do something with response error
+    console.log(error);
     return Promise.reject(error);
   }
 );

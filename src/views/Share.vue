@@ -65,26 +65,27 @@ export default {
       //   useCORS: true
       // }
       if (this.userInfo.share_qrcode) {
-        console.log("存在二维码")
-        this.getUrlBase64(this.userInfo.share_qrcode, res => {
-          console.log("二维码转换")
-          this.userInfo.share_qrcode = res;
-          setTimeout(()=>{
-            html2canvas(this.$refs.imageWrapper, {
-              backgroundColor: null, //解决生成会有白边的可能
-              allowTaint: true, //是否允许跨域图片(官方文档,代试验)
-              useCORS: true,
-              taintTest: true
-            }).then(canvas => {
-              console.log("生成", canvas);
-              // this.$refs.imageWrapper.appendChild(canvas)
-              let dataURL = canvas.toDataURL("image/png");
-              this.dataURL = dataURL;
-              this.ready(dataURL);
-            }).catch(err=>{
-              console.log(err)
-            });
-          },100)
+        this.getUrlBase64_pro(this.userInfo.user_image).then(res=>{
+          this.userInfo.user_image = res;
+          this.getUrlBase64(this.userInfo.share_qrcode, res => {
+            this.userInfo.share_qrcode = res;
+            setTimeout(()=>{
+              html2canvas(this.$refs.imageWrapper, {
+                backgroundColor: null, //解决生成会有白边的可能
+                allowTaint: true, //是否允许跨域图片(官方文档,代试验)
+                useCORS: true,
+                taintTest: true
+              }).then(canvas => {
+                console.log("生成图像元素",this.userInfo)
+                // this.$refs.imageWrapper.appendChild(canvas)
+                let dataURL = canvas.toDataURL("image/png");
+                this.dataURL = dataURL;
+                this.ready(dataURL);
+              }).catch(err=>{
+                console.log(err)
+              });
+            },100)
+          })
         });
       }
     },
@@ -103,6 +104,24 @@ export default {
         callback.call(this, dataURL); //回掉函数获取Base64编码
         canvas = null;
       }
+    },
+    getUrlBase64_pro(url) {
+      //网络资源图片转成base64
+      var canvas = document.createElement("canvas"); //创建canvas DOM元素
+      var ctx = canvas.getContext("2d");
+      return new Promise(reslove => {
+        var img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = function() {
+          canvas.height = 94.2; //指定画板的高度,自定义
+          canvas.width = 94.2; //指定画板的宽度，自定义
+          ctx.drawImage(img, 0, 0, 94.2, 94.2); //参数可自定义
+          var dataURL = canvas.toDataURL("image/");
+          canvas = null;
+          reslove(dataURL);
+        };
+        img.src = url;
+      });
     },
     ready(dataURL){
       let that = this;
@@ -127,6 +146,7 @@ export default {
 
 <style lang="scss" scoped>
 .share {
+  font-family: Source Han Sans CN;
   .imageWrapper {
     min-height: 100vh;
     background: url("../images/canvas-bg.png") no-repeat;
@@ -153,8 +173,10 @@ export default {
   // background-size: 100% 100%;
   // position: relative;
   .canvas-title {
-    width: 13.35rem;
-    height: 8.35rem;
+    // width: 13.35rem;
+    // height: 8.35rem;
+    width: 16.6875rem /* 267/16 */;
+    height: 10.3125rem /* 165/16 */;
     // margin-left: 1.875rem /* 30/16 */;
     margin-bottom: 2.15625rem;
   }
@@ -166,7 +188,7 @@ export default {
     color: rgba(255, 255, 255, 1);
     margin-bottom: 45.5px;
     .info-content {
-      margin-bottom: 0.8125rem;
+      margin-bottom: 0.5125rem; /* 30/16 */;
       & span:nth-child(2) {
         font-size: 1.1875rem;
         font-family: Source Han Sans CN;
@@ -184,9 +206,9 @@ export default {
     img {
       width: 100%;
       height: 100%;
-      margin-bottom: 1.0625rem /* 17/16 */;
+      margin-bottom: 0.625rem /* 17/16 */;
       background: white;
-      border-radius: 5px;
+      border-radius: .625rem /* 10/16 */;
       overflow: hidden;
     }
     .text {
@@ -201,7 +223,7 @@ export default {
     // width: 58.1%;
     // height: 42.4%;
     width: 13.625rem /* 218/16 */;
-    height: 21.8438rem /* 349.5/16 */;
+    height: 22.8438rem;
     position: absolute;
     bottom: 0;
     right: 0;
@@ -210,13 +232,16 @@ export default {
     border: none;
     .canvas-user {
       position: absolute;
-      top: -4.5px /* 5/16 */;
-      right: 1.625rem /* 26/16 */;
+      top: -0.3125rem /* 5/16 */;
+      right: 1.425rem;
       width: 5.8875rem /* 94.2/16 */;
       height: 5.8875rem /* 94.2/16 */;
       border: 2px solid rgba(255, 255, 255, 1);
       border-radius: 100%;
       overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       img {
         width: 100%;
         height: 100%;

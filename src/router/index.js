@@ -38,13 +38,6 @@ const router = new VueRouter({
   routes
 });
 
-router.beforeEach((to, from, next) => {
-  if (!getIsWxClient()) {
-    next({ path: "/client" });
-  }
-  next();
-});
-
 /**
  * 判断是否是微信环境
  */
@@ -55,5 +48,12 @@ function getIsWxClient() {
   }
   return false;
 }
+
+router.beforeEach((to, from, next) => {
+  if (!getIsWxClient()) {
+    next({ path: "/client" });
+  }
+  next();
+});
 
 export default router;

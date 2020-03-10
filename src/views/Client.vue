@@ -14,7 +14,5 @@ div {
 
 
 <script>
-export default {
-
-}
+export default {}
 </script>
