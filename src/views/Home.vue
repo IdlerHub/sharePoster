@@ -16,7 +16,13 @@
       <div class="container">
         <div class="user-info">
           <div class="info">姓名</div>
-          <input type="text" maxlength="8" placeholder="请输入本人姓名" v-model="userName" @blur="scrollTop" />
+          <input
+            type="text"
+            maxlength="8"
+            placeholder="请输入本人姓名"
+            v-model="userName"
+            @blur="scrollTop"
+          />
         </div>
         <div class="user-info">
           <div class="info">学校</div>
@@ -49,7 +55,12 @@
             <img class="user-img" :src="user_image" alt="" />
             <img class="del" src="@/images/del-img.png" alt @click="delImg" />
           </div>
-          <div v-show="preFlag" class="watch-img" @click="unpreview" @touchmove.prevent.stop>
+          <div
+            v-show="preFlag"
+            class="watch-img"
+            @click="unpreview"
+            @touchmove.prevent.stop
+          >
             <img :src="user_image" alt="" />
           </div>
         </div>
@@ -65,7 +76,7 @@ export default {
   name: "home",
   data() {
     return {
-      display: '',
+      display: "",
       number: "",
       preFlag: false, //图片预览
       showFlag: false,
@@ -102,16 +113,13 @@ export default {
   },
   methods: {
     init() {
-      console.log(window.location.href.split("#")[0]);
       window.location.href.split("#")[0];
       let url = encodeURIComponent(window.location.href.split("#")[0]);
-      console.log(url);
       this.getJsConfig(url);
     },
     getJsConfig(url) {
       let params = { url };
       http.getJsConfig(params).then(res => {
-        console.log(res);
         this.$wx.config({
           debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
           appId: "wxbd85dc45a5a84cd8", // 必填，公众号的唯一标识
@@ -129,12 +137,10 @@ export default {
       });
     },
     confirmSc(val) {
-      console.log("点击确定,confirmFn", val[2]);
       this.userSchool = val[2];
       this.showFlag = false;
     },
     cancelSc() {
-      console.log("点击取消");
       this.showFlag = false;
       //如果取消要重置,需要将id设置为初始位置
     },
@@ -147,12 +153,10 @@ export default {
         this.province_id = this.columns[0].id[provinceIndex];
         this.getCity(this.province_id);
       } else if (this.city_id !== this.columns[1].id[cityIndex]) {
-        console.log("市区变化");
         this.city_id = this.columns[1].id[cityIndex];
         this.getAllUniversity(this.city_id);
       } else {
         this.university_id = this.columns[2].id[schoolIndex];
-        console.log("校区变更", this.university_id);
       }
     },
     showSchool() {
@@ -177,7 +181,6 @@ export default {
       //获取市区
       let params = { province_id };
       http.getCity(params).then(res => {
-        console.log("获取校区");
         let name = [];
         let id = [];
         res.map(item => {
@@ -207,19 +210,21 @@ export default {
     },
     putUserInfo(params) {
       let that = this;
-      http.putUserInfo(params).then(res => {
-        localStorage.setItem("userInfo", JSON.stringify(params));
-        that.$router.replace({ path: "/share" });
-        console.log("请求成功",res)
-      }).catch(err=>{
-        this.$toast("网络错误,请重新操作")
-        console.log(err)
-      });
+      http
+        .putUserInfo(params)
+        .then(res => {
+          localStorage.setItem("userInfo", JSON.stringify(params));
+          that.$router.replace({ path: "/share" });
+          console.log(res);
+        })
+        .catch(err => {
+          this.$toast("网络错误,请重新操作");
+          console.log(err);
+        });
     },
     getUserInfo(uid) {
       this.number = uid;
       let params = { uid };
-      console.log(uid)
       http.getUserInfo(params).then(res => {
         this.userName = res.name;
         this.userSchool = res.university_name;
@@ -233,7 +238,6 @@ export default {
       });
     },
     next() {
-      console.log("下一步");
       this.userName = this.userName.trim();
       if (!this.userName) {
         this.$toast("请输入姓名");
@@ -242,7 +246,6 @@ export default {
       } else if (this.user_image == "") {
         this.$toast("请上传图片");
       } else {
-        console.log(this.province_id, this.city_id, this.university_id);
         let params = {
           uid: this.$store.state.uid,
           // uid: '1087',
@@ -255,8 +258,7 @@ export default {
           province_id: this.province_id,
           city_id: this.city_id,
           university: this.university_id,
-          user_createtime: this.user_createtime,
-
+          user_createtime: this.user_createtime
         };
         this.putUserInfo(params);
       }
@@ -264,10 +266,8 @@ export default {
     previewImg(event) {
       let reader = new FileReader();
       let img = event.target.files[0]; //图片属性
-      console.log("选择图片", event);
       reader.readAsDataURL(img);
       reader.onload = () => {
-        console.log("file 转 base64结果：" + reader.result);
         this.user_image = reader.result;
       };
       reader.onerror = function(error) {
@@ -293,42 +293,25 @@ export default {
     },
     chooseImg() {
       let that = this;
-      console.log("上传图片");
       that.$wx.chooseImage({
         count: 1,
         sizeType: ["compressed"],
         sourceType: ["album", "camera"],
         success(res) {
           let localIds = res.localIds;
-          console.log("localId", localIds);
-          // that.$wx.getLocalImgData({
-          //   localId: localIds[0], // 图片的localID
-          //   success: function(res) {
-          //     var localData = res.localData; // localData是图片的base64数据，可以用img标签显示
-          //     if(localData.substr(0,4) == 'data'){
-          //       that.user_image = localData;
-          //     }else{
-          //       that.user_image = 'data:image/png;base64,' + localData;
-          //     }
-          //     console.log("本地base64",res)
-          //   }
-          // });
           setTimeout(() => {
             that.$wx.uploadImage({
               localId: localIds[0],
               isShowProgressTips: 1,
               success: function(res) {
-                console.log("上传图片回调", res);
                 // let mediaId = res.serverId;
                 let params = { serverId: res.serverId };
-                console.log("上传图片传参", params);
                 http.uploadImage(params).then(res => {
-                  console.log("上传回调", res);
                   that.user_image = res.image;
                 });
               },
               fail: function(err) {
-                console.log("上传失败回调", err);
+                console.log("上传失败", err);
               }
             });
           }, 100);
@@ -338,55 +321,41 @@ export default {
         }
       });
     },
-    scrollTop(){
-      console.log("失去焦点")
-        window.scroll(0, 0);
-      // document.getElementById("#user_name").blur(()=>{
-      //   consnole.log("失去聚焦")
-      // })
+    scrollTop() {
+      //苹果手机键盘弹起产生多余块
+      window.scroll(0, 0);
     },
-    androidFcous(){
+    androidFcous() {
+      //安卓适配 键盘弹起页面压缩
       const u = navigator.userAgent;
       let that = this;
-      if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1) { //安卓手机
-        console.log("安卓手机触发")
+      if (u.indexOf("Android") > -1 || u.indexOf("Linux") > -1) {
+        //安卓手机
         // 获取视图原始高度
         let screenHeight = document.body.offsetHeight;
         // 为window绑定resize事件
         window.onresize = function() {
           let nowHeight = document.body.offsetHeight;
           if (nowHeight < screenHeight) {
-            // 将底部弹起的按钮隐藏（可使用给按钮添加相应消失类）
-            console.log("弹起,页面变小了",nowHeight)
             that.display = "display: none";
-            // that.$refs.Photo.style.display = "none";
           } else {
-            // 将按钮正常显示（可使用给按钮移除相应消失类）
-            console.log("弹起,没有变化",nowHeight)
             that.display = "";
-            // that.$refs.Photo.style.display = "block";
           }
-        }
-      }else{
-        console.log("苹果手机")
-        
+        };
       }
-      // let that = this;
     }
   },
   created() {
     this.init();
   },
   mounted() {
-    console.log('home.vue',this.number);
     this.$store.state.uid && this.getUserInfo(this.$store.state.uid);
     this.getAllProvince();
-    this.androidFcous()
+    this.androidFcous();
   },
-  watch:{
-    "$store.state.uid"(nVal){
-      console.log("watch")
-      if(nVal) this.getUserInfo(nVal);
+  watch: {
+    "$store.state.uid"(nVal) {
+      if (nVal) this.getUserInfo(nVal);
     }
   }
 };
@@ -461,7 +430,7 @@ export default {
         margin-bottom: 1.25rem /* 20/16 */;
         margin-left: 2.9688rem /* 47.5/16 */;
         .info {
-          margin-bottom: .625rem /* 10/16 */;
+          margin-bottom: 0.625rem /* 10/16 */;
           font-size: 1.1875rem;
           font-family: Source Han Sans CN;
           font-weight: 500;
@@ -530,7 +499,7 @@ export default {
         }
         .upload {
           width: 5.9375rem /* 95/16 */;
-          height: 5.9375rem; 
+          height: 5.9375rem;
           border: 1px solid #d00000;
           border-radius: 5px;
           display: flex;
@@ -577,7 +546,7 @@ export default {
             height: 1.5rem /* 24/16 */;
             position: absolute;
             top: -0.59375rem;
-            right: -.625rem /* 10/16 */;
+            right: -0.625rem /* 10/16 */;
             z-index: 2;
           }
         }
@@ -614,29 +583,30 @@ export default {
 }
 
 @media screen and (max-height: 667px) {
-  .home .content .title{
+  .home .content .title {
     margin-top: 2.5rem /* 40/16 */;
   }
-  .home .content .container{
-    margin-top: .425rem /* 10/16 */;
+  .home .content .container {
+    margin-top: 0.425rem /* 10/16 */;
   }
-  .home .content .container .user-info{
-    margin-bottom: .4rem;
+  .home .content .container .user-info {
+    margin-bottom: 0.4rem;
   }
 }
-@media screen and (max-height: 568px){  //iphone5
-  .home .content .title{
+@media screen and (max-height: 568px) {
+  //iphone5
+  .home .content .title {
     margin-top: 3.0938rem /* 49.5/16 */;
   }
-  .home .content .container{
-    margin-top: 1.25rem /* 20/16 */;;
+  .home .content .container {
+    margin-top: 1.25rem /* 20/16 */;
   }
-  .home .content .container .user-info{
+  .home .content .container .user-info {
     margin-bottom: 1rem;
   }
 }
-@media screen and (min-height: 812px){
-  .home .content .title{
+@media screen and (min-height: 812px) {
+  .home .content .title {
     margin-top: 3.2188rem /* 51.5/16 */;
   }
 }

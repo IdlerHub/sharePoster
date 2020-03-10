@@ -41,9 +41,9 @@ export default {
       this.autoplay();
     } else {
       this.$wx.miniProgram.getEnv(res => {
-        console.log("mini")
+        console.log("mini");
         if (res.miniprogram) {
-          console.log("app.vue")
+          console.log("app.vue");
           this.init();
           this.autoplay();
         }
@@ -59,7 +59,6 @@ export default {
     init() {
       /* 用户id */
       const uid = this.$utils.getQueryString("uid");
-      console.log("uid", uid);
       this.$store.commit("setUid", { uid });
     },
     // music(){
@@ -76,13 +75,11 @@ export default {
         }
       });
       document.addEventListener("visibilitychange", () => {
-        console.log(document.hidden);
         if (document.hidden) {
-          console.log("页面隐藏")
           audio.pause();
           // this.musicFlag = false;
         } else {
-          if(this.musicFlag) {
+          if (this.musicFlag) {
             setTimeout(() => {
               audio.play();
               this.musicFlag = true;
@@ -99,10 +96,10 @@ export default {
       } else {
         this.$refs.MusicPlay.play();
       }
-    },
+    }
     // shareReady(){
     //   this.$wx.ready(()=>{
-    //     wx.updateAppMessageShareData({ 
+    //     wx.updateAppMessageShareData({
     //       title: '', // 分享标题
     //       desc: '', // 分享描述
     //       link: '', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
