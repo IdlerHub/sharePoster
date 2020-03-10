@@ -130,6 +130,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
   position: relative;
+  -webkit-text-size-adjust: none;
 }
 
 html {

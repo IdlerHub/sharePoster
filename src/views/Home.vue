@@ -469,8 +469,9 @@ export default {
         }
         .info-school {
           width: 76.82%;
-          height: 2.625rem;
-          line-height: 2.625rem;
+          height: 2.5rem;
+          line-height: 2.5rem;
+          // padding: 1px;
           border: 1px solid #d42220;
           border-radius: 0.3125rem;
           color: #d42220;
@@ -499,6 +500,7 @@ export default {
         input {
           width: 76.82%;
           height: 2.5rem;
+          // line-height: 2.5rem;
           background: none;
           border: 1px solid #d42220;
           border-radius: 0.3125rem;
@@ -507,6 +509,7 @@ export default {
           font-family: Source Han Sans CN;
           font-weight: 400;
           color: rgba(212, 34, 32, 1);
+          padding: 0;
           padding-left: 4.12%;
           &::-webkit-input-placeholder {
             /* Chrome/Opera/Safari */

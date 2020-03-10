@@ -48,7 +48,9 @@ _axios.interceptors.response.use(
   },
   function(error) {
     // Do something with response error
-    console.log(error);
+    if (error && error.stack.indexOf("timeout") > -1) {
+      this.$toast("请求超时");
+    }
     return Promise.reject(error);
   }
 );
