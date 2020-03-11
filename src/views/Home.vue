@@ -66,6 +66,13 @@
         </div>
         <div class="submit-img" :style="display" @click="next"></div>
       </div>
+      <div class="upload-tip" v-if="showTip">
+        <div class="img-tip">
+          <img src="@/images/user-img.png" alt />
+          <div>请参考以上照片上传,</div>
+          <div>作为头像生成海报</div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -76,6 +83,7 @@ export default {
   name: "home",
   data() {
     return {
+      showTip: false,
       display: "",
       number: "",
       preFlag: false, //图片预览
@@ -278,42 +286,41 @@ export default {
     },
     chooseImg() {
       let that = this;
-      that.$wx.chooseImage({
-        count: 1,
-        sizeType: ["compressed"],
-        sourceType: ["album", "camera"],
-        success(res) {
-          let localIds = res.localIds;
-          this.$toast.loading({
-            duration: 0,
-            forbidClick: true,
-            mask: true,
-            message: "图片上传中"
-          })
-          setTimeout(() => {
-            that.$wx.uploadImage({
-              localId: localIds[0],
-              isShowProgressTips: 1,
-              success: function(res) {
-                // let mediaId = res.serverId;
-                let params = { serverId: res.serverId };
-                http.uploadImage(params).then(res => {
-                  that.user_image = res.image;
-                  this.$toast.success("上传完成");
-                  this.$toast.clear();
-                });
-              },
-              fail: function(err) {
-                console.log("上传失败", err);
-                this.$toast.fail("上传失败");
-              }
-            });
-          }, 100);
-        },
-        fail(err) {
-          console.log("错误", err);
-        }
-      });
+      this.showTip = true;
+      setTimeout(()=>{
+        that.showTip = false;
+        that.$wx.chooseImage({
+          count: 1,
+          sizeType: ["compressed"],
+          sourceType: ["album", "camera"],
+          success(res) {
+            let localIds = res.localIds;
+            setTimeout(() => {
+              that.$wx.uploadImage({
+                localId: localIds[0],
+                isShowProgressTips: 1,
+                success: function(res) {
+                  // let mediaId = res.serverId;
+                  let params = { serverId: res.serverId };
+                  http.uploadImage(params).then(res => {
+                    that.user_image = res.image;
+                    that.$toast.success("上传完成");
+                    // that.$toast.clear();
+                  });
+                },
+                fail: function(err) {
+                  console.log("上传失败", err);
+                  that.$toast.success("上传失败");
+                }
+              });
+            }, 100);
+          },
+          fail(err) {
+            console.log("错误", err);
+          }
+        });
+      },3000)
+      
     },
     scrollTop() {//苹果手机键盘弹起产生多余块
       window.scroll(0, 0);
@@ -575,6 +582,42 @@ export default {
   }
 }
 
+.upload-tip{
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  .img-tip{
+    width: 12.5rem /* 200/16 */;
+    height: 12.5rem /* 200/16 */;
+    background:rgba(0,0,0,0.7);
+    border-radius:.625rem /* 10/16 */;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    img{
+      width: 5.375rem /* 86/16 */;
+      height: 5.25rem /* 84/16 */;
+      margin-bottom: 1.5313rem /* 24.5/16 */;
+    }
+    div{
+      // width: 10.3438rem /* 165.5/16 */;
+      max-width: 100%;
+      font-size:1.125rem /* 18/16 */;
+      font-family:Source Han Sans CN;
+      font-weight:400;
+      color:rgba(255,255,255,1);
+      text-align: center;  
+    }
+  }
+}
+
 @media screen and (max-height: 667px) {
   .home .content .title {
     margin-top: 2.5rem /* 40/16 */;
@@ -603,21 +646,4 @@ export default {
     margin-top: 3.2188rem /* 51.5/16 */;
   }
 }
-// @media screen and (max-height: 667px) {
-//   .home .content {
-//     position: relative;
-//     top: 0;
-//     right: 0;
-//   }
-//   .home .content .container .user-info input {
-//     width: 76.82%;
-//   }
-// }
-// @media screen and (min-width: 375px) {
-//   .home .content {
-//     position: relative;
-//     top: 0;
-//     right: 0;
-//   }
-// }
 </style>

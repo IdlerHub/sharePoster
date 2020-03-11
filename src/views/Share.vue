@@ -35,8 +35,9 @@
         </div>
       </slot>
     </div>
+    <div class="watermark">长按海报保存图片</div>
     <div class="show-msg" v-if="msgShow">
-      <div class="msg">长按保存海报或发送好友</div>
+      <div class="msg">长按海报发送给好友</div>
     </div>
   </div>
 </template>
@@ -67,9 +68,9 @@ export default {
       Promise.all([that.getUrlBase64_pro(108,this.userInfo.share_qrcode),
         that.getUrlBase64_pro(94.2,this.userInfo.user_image)])
           .then(res=>{
-            console.log("海报",res);
-            this.userInfo.share_qrcode = res[0];
-            this.userInfo.user_image = res[1];
+            console.log("海报",res[1]);
+            // this.userInfo.share_qrcode = res[0]; //图片会变模糊
+            // this.userInfo.user_image = res[1];
             setTimeout(() => {
               html2canvas(this.$refs.imageWrapper, {
                 backgroundColor: null, //解决生成会有白边的可能
@@ -91,6 +92,7 @@ export default {
     },
     getUrlBase64_pro(len,url) {
       //网络资源图片转成base64
+      console.log("图片路径",url)
       var canvas = document.createElement("canvas"); //创建canvas DOM元素
       var ctx = canvas.getContext("2d");
       return new Promise((reslove, reject) => {
@@ -132,6 +134,7 @@ export default {
 <style lang="scss" scoped>
 .share {
   font-family: Source Han Sans CN;
+  position: relative;
   .imageWrapper {
     min-height: 100vh;
     background: url("../images/canvas-bg.png") no-repeat;
@@ -161,9 +164,9 @@ export default {
     font-size: 1.5rem /* 24/16 */;
     color: white;
     .msg{
-      width: 21.9375rem /* 351/16 */;
-      height: 2.8125rem /* 45/16 */;
-      line-height: 2.8125rem;
+      width: 15.3125rem /* 245/16 */;
+      height: 3.125rem /* 50/16 */;
+      line-height: 3.125rem /* 50/16 */;
       text-align: center;
       background: rgba(0,0,0,.6);
       border-radius: .3125rem /* 5/16 */;
@@ -253,5 +256,16 @@ export default {
       }
     }
   }
+}
+.watermark{
+  // width:319px;
+  // height:38px;
+  font-size: 1.25rem /* 20/16 */;
+  font-family:Source Han Sans CN;
+  font-weight: bold;
+  color:rgba(255,255,255,0.3);
+  position: absolute;
+  bottom: 1.875rem /* 30/16 */;
+  left: 2rem /* 32/16 */;
 }
 </style>
