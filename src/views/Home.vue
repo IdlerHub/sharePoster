@@ -263,17 +263,6 @@ export default {
         this.putUserInfo(params);
       }
     },
-    previewImg(event) {
-      let reader = new FileReader();
-      let img = event.target.files[0]; //图片属性
-      reader.readAsDataURL(img);
-      reader.onload = () => {
-        this.user_image = reader.result;
-      };
-      reader.onerror = function(error) {
-        console.log("Error: ", error);
-      };
-    },
     delImg() {
       //删除图片
       this.user_image = "";
@@ -289,13 +278,18 @@ export default {
     },
     chooseImg() {
       let that = this;
-      this.$toast("这里的头像将作为您的海报头像哦");
       that.$wx.chooseImage({
         count: 1,
         sizeType: ["compressed"],
         sourceType: ["album", "camera"],
         success(res) {
           let localIds = res.localIds;
+          this.$toast.loading({
+            duration: 0,
+            forbidClick: true,
+            mask: true,
+            message: "图片上传中"
+          })
           setTimeout(() => {
             that.$wx.uploadImage({
               localId: localIds[0],
@@ -305,10 +299,13 @@ export default {
                 let params = { serverId: res.serverId };
                 http.uploadImage(params).then(res => {
                   that.user_image = res.image;
+                  this.$toast.success("上传完成");
+                  this.$toast.clear();
                 });
               },
               fail: function(err) {
                 console.log("上传失败", err);
+                this.$toast.fail("上传失败");
               }
             });
           }, 100);

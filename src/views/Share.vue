@@ -35,6 +35,9 @@
         </div>
       </slot>
     </div>
+    <div class="show-msg" v-if="msgShow">
+      <div class="msg">长按保存海报或发送好友</div>
+    </div>
   </div>
 </template>
 <script>
@@ -43,6 +46,7 @@ export default {
   name: "share",
   data() {
     return {
+      msgShow: true,
       userInfo: {},
       dataURL: "",
       ercode: ""
@@ -51,7 +55,10 @@ export default {
   mounted() {
     // localStorage.getItem('userInfo')
     this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    this.$toast("长按海报发送给好友");
+    setTimeout(()=>{
+      this.msgShow = false;
+    },1500)
+    // this.$toast("长按海报发送给好友");
     this.toImage();
   },
   methods: {
@@ -86,7 +93,7 @@ export default {
       //网络资源图片转成base64
       var canvas = document.createElement("canvas"); //创建canvas DOM元素
       var ctx = canvas.getContext("2d");
-      return new Promise(reslove => {
+      return new Promise((reslove, reject) => {
         var img = new Image();
         img.crossOrigin = "Anonymous";
         img.onload = function() {
@@ -97,6 +104,9 @@ export default {
           canvas = null;
           reslove(dataURL);
         };
+        img.onerror = function(err){
+          reject(err)
+        }
         img.src = url;
       });
     },
@@ -137,6 +147,26 @@ export default {
       right: 0;
       z-index: 88;
       opacity: 0;
+    }
+  }
+  .show-msg{
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem /* 24/16 */;
+    color: white;
+    .msg{
+      width: 21.9375rem /* 351/16 */;
+      height: 2.8125rem /* 45/16 */;
+      line-height: 2.8125rem;
+      text-align: center;
+      background: rgba(0,0,0,.6);
+      border-radius: .3125rem /* 5/16 */;
     }
   }
 }
