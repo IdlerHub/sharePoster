@@ -121,7 +121,6 @@ export default {
   },
   methods: {
     init() {
-      window.location.href.split("#")[0];
       let url = encodeURIComponent(window.location.href.split("#")[0]);
       this.getJsConfig(url);
     },
@@ -142,6 +141,8 @@ export default {
             "uploadImage"
           ] // 必填，需要使用的JS接口列表
         });
+      }).catch(err=>{
+        console.log("授权",err)
       });
     },
     confirmSc(val) {
@@ -178,7 +179,7 @@ export default {
         res.map(item => {
           name.push(item["name"]);
           id.push(item["id"]);
-        });
+        })
         this.columns[0].values = name;
         this.columns[0].id = id;
         this.province_id = this.columns[0].id[0];
@@ -306,11 +307,12 @@ export default {
                     that.user_image = res.image;
                     that.$toast.success("上传完成");
                     // that.$toast.clear();
+                  }).catch(err=>{
+                    that.$toast.fail(err.msg);
                   });
                 },
                 fail: function(err) {
-                  console.log("上传失败", err);
-                  that.$toast.success("上传失败");
+                  that.$toast.fail(err.msg);
                 }
               });
             }, 100);

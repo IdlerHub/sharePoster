@@ -34,6 +34,8 @@ export default {
     };
   },
   created() {
+    // this.init();
+    // this.autoplay();
     if (process.env.NODE_ENV == "development") {
       this.init();
       this.autoplay();
