@@ -326,6 +326,8 @@ export default {
     },
     scrollTop() {//苹果手机键盘弹起产生多余块
       window.scroll(0, 0);
+      // this.display = "";
+      // console.log("返回顶部")
     },
     androidFcous() {
       //安卓适配 键盘弹起页面压缩
@@ -334,15 +336,23 @@ export default {
       if (u.indexOf("Android") > -1 || u.indexOf("Linux") > -1) {
         //安卓手机
         // 获取视图原始高度
-        let screenHeight = document.body.offsetHeight;
+        // let screenHeight = document.body.offsetHeight;
         // 为window绑定resize事件
         window.onresize = function() {
           let nowHeight = document.body.offsetHeight;
-          if (nowHeight < screenHeight) {
-            that.display = "display: none";
-          } else {
-            that.display = "";
-          }
+          // console.log(document.activeElement.tagName)
+          // if (nowHeight < screenHeight) {
+            if(nowHeight < 450){
+              that.display = "display: none";
+            }else{
+              that.display = "";
+            }
+            // console.log("高度",nowHeight,screenHeight)
+            // that.display = "display: none";
+          // } else {
+          //   console.log("显示",nowHeight,screenHeight)
+          //   that.display = "";
+          // }
         };
       }
     }
